@@ -1,0 +1,91 @@
+name: HAOS-CN
+on:
+  workflow_dispatch:
+
+  #schedule:
+  #  - cron: '0 18 * * *'
+  watch:
+    types: [started]
+
+env:
+  RUN_VALIDATION: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    #runs-on: self-hosted
+    name: Build ${{matrix.target}}
+    strategy:
+      fail-fast: false
+      matrix:
+        #target: [rpi3_64,rpi4_64,rpi5_64,ova,generic_x86_64,generic_aarch64]
+        target: [generic_aarch64,generic_x86_64]
+
+    steps:
+    #- name: Checkout
+    #  uses: actions/checkout@v3
+      
+    - name: Get HAOS-CN version
+      id: get_haos_version
+      run: |
+        ver=$(curl -s https://version.home-assistant.io/stable.json | jq -r '.hassos."ova"')
+        echo "HASSOS_VERSION=${ver}" >> $GITHUB_ENV
+        
+    - name: Initialization environment and Free up disk space
+      run: |
+        sudo timedatectl set-timezone "Asia/Shanghai"
+        sudo rm -rf /usr/local/lib/android
+        sudo rm -rf /opt/ghc
+        sudo rm -rf /var/lib/apt/lists/*
+        sudo rm -rf /var/cache/apt/archives/*
+        sudo rm -rf /var/cache/debconf/*-old
+        sudo apt clean
+        sudo rm -rf /etc/apt/sources.list.d/*
+        sudo apt-get -qq update -y
+        sudo apt-get -qq autoremove --purge -y
+        sudo apt-get -qq clean -y
+        sudo rm -rf "/usr/local/share/boost"
+        sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+        #sudo rm -rf /usr/share/
+        df -h
+
+
+    - name: Clone source code and Change Settings.
+      run: |
+        git clone https://github.com/home-assistant/operating-system.git
+        cd operating-system
+        git switch -c ${{ env.HASSOS_VERSION }}
+        echo "replace key information"
+        sed -i 's|version.home-assistant.io|version.hasscn.top|g' buildroot-external/package/hassio/hassio.mk
+        sed -i 's|ghcr.io/home-assistant|ghcr.nju.edu.cn/ha-china|g' buildroot-external/package/hassio/dind-import-containers.sh
+        sed -i 's|ghcr.io/home-assistant|ghcr.nju.edu.cn/ha-china|g' buildroot-external/rootfs-overlay/usr/sbin/hassos-supervisor
+        git submodule update --init
+
+    - name: Build
+      shell: 'script -q -e -c "bash {0}"'
+      id: build
+      run: |
+        sleep $((RANDOM % 60))    
+        cd operating-system
+        sudo scripts/enter.sh make -j$(($(nproc) + 1)) ${{matrix.target}}
+        
+    - name: Get current date
+      id: current_date
+      run: |
+        current_date=$(date +'%Y-%m-%d')
+        echo "CURRENT_DATE=${current_date}" >> $GITHUB_ENV
+    
+    - name: Use current date
+      run: echo "Current date is $CURRENT_DATE"
+
+    - name: Upload images to release
+      id: upload-release
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.UPLOAD_TOKEN }}
+        repository: ha-china/Release  # 组织名/目标仓库
+        file: operating-system/output/images/haos_*
+        tag: ${{ env.HASSOS_VERSION }}
+        overwrite: true
+        file_glob: true
+        body: "国内专用HAOS，对系统无任何修改，只添加国内镜像。公众号：老王杂谈说，欢迎关注"

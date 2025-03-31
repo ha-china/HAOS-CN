@@ -1,0 +1,34 @@
+name: Test Upload to ha-china/Release
+
+on:
+  workflow_dispatch:  # 允许手动触发
+
+jobs:
+  test-upload:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source repository
+        uses: actions/checkout@v4
+
+      - name: Check Authentication
+        run: |
+          curl -H "Authorization: token ${{ secrets.UPLOAD_TOKEN }}" \
+               -H "Accept: application/vnd.github.v3+json" \
+               https://api.github.com/user
+
+      - name: List Repos Accessible by PAT
+        run: |
+          curl -H "Authorization: token ${{ secrets.UPLOAD_TOKEN }}" \
+               -H "Accept: application/vnd.github.v3+json" \
+               https://api.github.com/user/repos?per_page=100
+
+      - name: Test Push to ha-china/Release
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git clone https://x-access-token:${{ secrets.UPLOAD_TOKEN }}@github.com/ha-china/Release.git
+          cd Release
+          echo "Test commit from GitHub Actions" > test_file.txt
+          git add test_file.txt
+          git commit -m "Test commit via GitHub Actions"
+          git push origin main

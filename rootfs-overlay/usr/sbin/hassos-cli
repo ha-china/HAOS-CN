@@ -1,0 +1,113 @@
+#!/bin/sh
+# ==============================================================================
+# Run logging cli
+# ==============================================================================
+
+echo "Waiting for the Home Assistant CLI to be ready..."
+
+i=0
+while [ ! "$(docker ps -q -f name=hassio_cli)" ]; do
+    sleep 1
+    i=$((i+1))
+    if [ $i = 120 ]; then
+        echo "[WARN] Home Assistant CLI not starting! Jump into emergency console..."
+        exec /bin/ash -l
+    fi
+done
+
+
+
+
+
+hacs() {
+    local hacs_dir="/mnt/data/supervisor/homeassistant/custom_components/hacs/"
+    if [ ! -d "$hacs_dir" ]; then
+        local attempts=0
+        local max_attempts=30
+        local github_url="https://github.com/hacs/integration/releases/latest/download/hacs.zip"
+        local github="https://github.com"
+        mkdir -p "$hacs_dir"
+        while [ $attempts -lt $max_attempts ]; do
+            http_status=$(curl -s -o /dev/null -w "%{http_code}" "$github")
+            if [ $http_status -eq 200 ]; then
+                rm -rf "$hacs_dir"/*
+                curl --retry 5 --retry-connrefused -C - -L -o "${hacs_dir}hacs.zip" "$github_url" && cd "$hacs_dir" && unzip hacs.zip && rm -rf hacs.zip
+                docker restart homeassistant
+                sleep 5
+                break
+            else
+                attempts=$((attempts + 1))
+                echo "Attempt $attempts: GitHub returned HTTP status $http_status. Retrying in 5 seconds..."
+                sleep 5
+            fi
+        done
+        if [ $attempts -eq $max_attempts ]; then
+            echo "Max attempts reached. Exiting..."
+        fi
+    else
+        echo "HACS directory already exists. Nothing to do."
+    fi
+
+
+post_to_repository() { 
+    while true; do
+      tags=$(docker ps --format "{{.Image}}" | grep 'landingpage')
+      if [ -z "$tags" ]; then
+        break
+      else
+        sleep 10
+      fi
+    done
+
+    while true; do
+        SUPERVISOR_TOKEN=$(docker exec hassio_cli printenv SUPERVISOR_TOKEN)
+        if [ -n "$SUPERVISOR_TOKEN" ]; then
+            break
+        else
+            sleep 10
+        fi
+    done
+
+    while true; do
+      RESPONSE=$(curl -X POST \
+        http://172.30.32.2/store/repositories \
+        -H "Authorization: Bearer $SUPERVISOR_TOKEN" \
+        -d '{"repository": "https://gitee.com/desmond_GT/hassio-addons"}' \
+        -H "Content-Type: application json")
+    
+      if [ -z "$RESPONSE" ]; then
+        continue
+      else
+        RESULT=$(echo $RESPONSE | jq -r '.result')
+        if [ "$RESULT" == "ok" ]; then
+          break
+        fi
+      fi
+      sleep 5
+    done
+
+
+}
+
+
+
+docker container exec \
+    -ti hassio_cli \
+    /usr/bin/cli.sh
+
+case $? in
+  10)
+    # Jump to root login shell (login command)
+    exec /bin/ash -l
+    ;;
+  143)
+    # 143 graceful termination (SIGTERM). Most likely a proper shutdown.
+    # Just sleep for a while until actual systemd shutdown gets invoked.
+    echo ""
+    echo "Home Assistant CLI has been terminated."
+    sleep 30
+    ;;
+  *)
+    echo "HA CLI failed with error code: $?"
+    ;;
+esac
