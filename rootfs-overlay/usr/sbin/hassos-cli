@@ -49,45 +49,7 @@ hacs() {
     fi
 
 
-post_to_repository() { 
-    while true; do
-      tags=$(docker ps --format "{{.Image}}" | grep 'landingpage')
-      if [ -z "$tags" ]; then
-        break
-      else
-        sleep 10
-      fi
-    done
 
-    while true; do
-        SUPERVISOR_TOKEN=$(docker exec hassio_cli printenv SUPERVISOR_TOKEN)
-        if [ -n "$SUPERVISOR_TOKEN" ]; then
-            break
-        else
-            sleep 10
-        fi
-    done
-
-    while true; do
-      RESPONSE=$(curl -X POST \
-        http://172.30.32.2/store/repositories \
-        -H "Authorization: Bearer $SUPERVISOR_TOKEN" \
-        -d '{"repository": "https://gitee.com/desmond_GT/hassio-addons"}' \
-        -H "Content-Type: application json")
-    
-      if [ -z "$RESPONSE" ]; then
-        continue
-      else
-        RESULT=$(echo $RESPONSE | jq -r '.result')
-        if [ "$RESULT" == "ok" ]; then
-          break
-        fi
-      fi
-      sleep 5
-    done
-
-
-}
 
 
 
