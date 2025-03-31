@@ -25,7 +25,7 @@ docker pull ghcr.io/home-assistant/home-assistant:stable
 
 从这里下载静像
 
-链接: https://pan.baidu.com/s/1MNGTbFag18rrmgwd0BgPPA?pwd=yecx 提取码: yecx 复制这段内容后打开百度网盘手机App，操作更方便哦
+链接: [https://github.com/ha-china/HAOS-CN/releases/tag/15.0](https://github.com/ha-china/HAOS-CN/releases/tag/15.0)
 
 解压出文件haos_generic-x86-64-15.1.dev0.img
 
