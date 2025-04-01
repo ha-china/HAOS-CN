@@ -25,7 +25,10 @@ docker pull ghcr.io/home-assistant/home-assistant:stable
 
 从这里下载静像
 
-链接: [https://github.com/ha-china/HAOS-CN/releases/tag/15.0](https://github.com/ha-china/HAOS-CN/releases/tag/15.0)
+链接: [https://github.com/ha-china/HAOS-CN/releases/tag/15.1](https://github.com/ha-china/HAOS-CN/releases/tag/15.1)
+
+其它版本与官方安装一致，
+x86版本，如果没有物理机，可以通过解压后用qemu的方式测试，可能跟物理机会略有区别。
 
 解压出文件haos_generic-x86-64-15.1.dev0.img
 
