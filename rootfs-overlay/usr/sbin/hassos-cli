@@ -15,10 +15,6 @@ while [ ! "$(docker ps -q -f name=hassio_cli)" ]; do
     fi
 done
 
-
-
-
-
 hacs() {
     echo "Installing HACS China..."
     local hacs_dir="/mnt/data/supervisor/homeassistant/custom_components/hacs/"
@@ -48,6 +44,7 @@ hacs() {
     else
         echo "HACS directory already exists. Nothing to do."
     fi
+}
 
 if docker images | awk '{print $2}' | grep -q 'landingpage'; then
     hacs >/dev/null 2>&1 &
@@ -56,9 +53,6 @@ else
         hacs >/dev/null 2>&1 &
     fi
 fi
-
-
-
 
 docker container exec \
     -ti hassio_cli \
