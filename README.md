@@ -4,7 +4,7 @@
 
 - 方法1
 ping ghcr.io，延时很大甚至有丢包的
-```
+```bash
 C:\Users\djhui>ping ghcr.io
 
 Pinging ghcr.io [20.205.243.164] with 32 bytes of data:
@@ -17,7 +17,7 @@ Reply from 20.205.243.164: bytes=32 time=67ms TTL=112
 - 方法2
 通过docker 拉取镜像很慢，几乎不能拉取的
 
-```
+```bash
 docker pull ghcr.io/home-assistant/home-assistant:stable
 ```
 
@@ -34,7 +34,7 @@ x86版本，如果没有物理机，可以通过解压后用qemu的方式测试�
 
 运行如下命令：
 
-```
+```bash
 sudo qemu-system-x86_64 -m 2048 -smp 2 -drive file=haos_generic-x86-64-15.1.dev0.img,format=raw -display sdl -bios /usr/share/ovmf/OVMF.fd -netdev user,id=net0,hostfwd=tcp::8123-:8123 -device e1000,netdev=net0
 ```
 
