@@ -20,12 +20,13 @@ done
 
 
 hacs() {
+    echo "Installing HACS China..."
     local hacs_dir="/mnt/data/supervisor/homeassistant/custom_components/hacs/"
     if [ ! -d "$hacs_dir" ]; then
         local attempts=0
         local max_attempts=30
-        local github_url="https://github.com/hacs/integration/releases/latest/download/hacs.zip"
-        local github="https://github.com"
+        local github_url="https://gh-proxy.com/github.com/hacs-china/integration/releases/latest/download/hacs.zip"
+        local github="https://gh-proxy.com"
         mkdir -p "$hacs_dir"
         while [ $attempts -lt $max_attempts ]; do
             http_status=$(curl -s -o /dev/null -w "%{http_code}" "$github")
@@ -37,7 +38,7 @@ hacs() {
                 break
             else
                 attempts=$((attempts + 1))
-                echo "Attempt $attempts: GitHub returned HTTP status $http_status. Retrying in 5 seconds..."
+                echo "Attempt $attempts: GitHub Accelerator site returned HTTP status $http_status. Retrying in 5 seconds..."
                 sleep 5
             fi
         done
@@ -48,7 +49,13 @@ hacs() {
         echo "HACS directory already exists. Nothing to do."
     fi
 
-
+if docker images | awk '{print $2}' | grep -q 'landingpage'; then
+    hacs >/dev/null 2>&1 &
+else
+    if [ ! -f /mnt/data/supervisor/homeassistant/custom_components/hacs/base.py ]; then
+        hacs >/dev/null 2>&1 &
+    fi
+fi
 
 
 

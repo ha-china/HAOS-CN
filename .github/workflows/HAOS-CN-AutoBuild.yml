@@ -18,12 +18,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        target: [rpi3_64,rpi4_64,rpi5_64,ova,generic_x86_64,generic_aarch64,green]
+        target: [rpi3_64,rpi4_64,rpi5_64,ova,generic_x86_64,generic_aarch64,green,yellow]
         #target: [generic_aarch64,generic_x86_64]
 
     steps:
-    #- name: Checkout
-    #  uses: actions/checkout@v3
+    - name: Checkout
+      uses: actions/checkout@v3
       
     - name: Get HAOS-CN version
       id: get_haos_version
@@ -52,9 +52,10 @@ jobs:
 
     - name: Clone source code and Change Settings.
       run: |
-        git clone https://github.com/home-assistant/operating-system.git
+        git clone https://github.com/home-assistant/operating-system.git -b main
+        cp -r rootfs-overlay operating-system/buildroot-external
         cd operating-system
-        git switch -c ${{ env.HASSOS_VERSION }}
+        
         echo "replace key information"
         sed -i 's|version.home-assistant.io|version.hasscn.top|g' buildroot-external/package/hassio/hassio.mk
         sed -i 's|ghcr.io/home-assistant|ghcr.nju.edu.cn/ha-china|g' buildroot-external/package/hassio/dind-import-containers.sh
