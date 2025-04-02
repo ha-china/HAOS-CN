@@ -13,7 +13,6 @@ Reply from 20.205.243.164: bytes=32 time=67ms TTL=112
 Reply from 20.205.243.164: bytes=32 time=67ms TTL=112
 Reply from 20.205.243.164: bytes=32 time=67ms TTL=112
 ```
-
 - 方法2
 通过docker 拉取镜像很慢，几乎不能拉取的
 
@@ -41,3 +40,5 @@ sudo qemu-system-x86_64 -m 2048 -smp 2 -drive file=haos_generic-x86-64-15.1.dev0
 - 浏览器访问localhost:8123
 
 记录整个初始化的时间告诉我
+
+当前版本已经集成了HACS极速版，可以在系统集成里直接添加
