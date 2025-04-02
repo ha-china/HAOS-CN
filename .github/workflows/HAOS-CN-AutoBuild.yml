@@ -4,8 +4,8 @@ on:
 
   #schedule:
   #  - cron: '0 18 * * *'
-  watch:
-    types: [started]
+#  watch:
+#    types: [started]
 
 env:
   RUN_VALIDATION: true
