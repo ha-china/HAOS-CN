@@ -42,3 +42,5 @@ sudo qemu-system-x86_64 -m 2048 -smp 2 -drive file=haos_generic-x86-64-15.1.img,
 记录整个初始化的时间告诉我
 
 当前版本已经集成了HACS极速版，可以在系统集成里直接添加
+
+## 如果你能适配机型，欢迎提交各类适配机型配置
