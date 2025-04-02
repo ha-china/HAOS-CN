@@ -2,8 +2,8 @@ name: HAOS-CN
 on:
   workflow_dispatch:
 
-  #schedule:
-  #  - cron: '0 18 * * *'
+  schedule:
+    - cron: '0 18 27 * *'
 #  watch:
 #    types: [started]
 
