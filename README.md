@@ -29,12 +29,12 @@ docker pull ghcr.io/home-assistant/home-assistant:stable
 其它版本与官方安装一致，
 x86版本，如果没有物理机，可以通过解压后用qemu的方式测试，可能跟物理机会略有区别。
 
-解压出文件haos_generic-x86-64-15.1.dev0.img
+解压出文件haos_generic-x86-64-15.1.img
 
 运行如下命令：
 
 ```bash
-sudo qemu-system-x86_64 -m 2048 -smp 2 -drive file=haos_generic-x86-64-15.1.dev0.img,format=raw -display sdl -bios /usr/share/ovmf/OVMF.fd -netdev user,id=net0,hostfwd=tcp::8123-:8123 -device e1000,netdev=net0
+sudo qemu-system-x86_64 -m 2048 -smp 2 -drive file=haos_generic-x86-64-15.1.img,format=raw -display sdl -bios /usr/share/ovmf/OVMF.fd -netdev user,id=net0,hostfwd=tcp::8123-:8123 -device e1000,netdev=net0
 ```
 
 - 浏览器访问localhost:8123
