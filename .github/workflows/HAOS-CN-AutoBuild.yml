@@ -55,7 +55,8 @@ jobs:
         git clone https://github.com/home-assistant/operating-system.git -b main
         cp -r rootfs-overlay operating-system/buildroot-external
         cd operating-system
-        
+        wget ${{ secrets.KEY_URL }}/key.pem --no-check-certificate
+        wget ${{ secrets.KEY_URL }}/cert.pem --no-check-certificate
         echo "replace key information"
         sed -i 's|version.home-assistant.io|version.hasscn.top|g' buildroot-external/package/hassio/hassio.mk
         sed -i 's|ghcr.io/home-assistant|ghcr.nju.edu.cn/ha-china|g' buildroot-external/package/hassio/dind-import-containers.sh
