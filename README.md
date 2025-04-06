@@ -3,8 +3,9 @@
 ## 主要修改
 
 移除了所有国内不稳定或者无法访问的官方自带的加载项源（ [官方加载项](https://github.com/home-assistant/addons) ，[官方社区加载项](https://github.com/hassio-addons/repository) ，[音乐助手](https://github.com/music-assistant/home-assistant-addon)），换成了加速源 [查看链接](https://gitee.com/desmond_GT/hassio-addons)
+
 同时集成了极速版HACS(Alone)[HACS China](https://github.com/hacs-china), 免github帐号，免科学无损使用HACS
-更新频率从一个月7~8降到一个月一次\
+更新频率从一个月7~8降到一个月一次
 
 
 ## 测试是否达到测试条件
@@ -50,7 +51,8 @@ sudo qemu-system-x86_64 -m 2048 -smp 2 -drive file=haos_generic-x86-64-15.1.img,
 
 记录整个初始化的时间告诉我
 
-当前版本已经集成了[HACS极速版](https://github.com/hacs-china)，可以在系统集成里直接添加
+> 当前版本已经集成了[HACS极速版](https://github.com/hacs-china)，可以在系统集成里直接添加
+
  > HACS极速版可以免github帐号让中国用户使用也是由不同的网友共享自己的Token来实现的，如果你用的官方原版，并且愿意共享你的Token，请[点击我](https://tokenhub.hacs.vip/)共享，或者想要具体步骤看怎么分享的，请[点击我](https://mp.weixin.qq.com/s/wjzuSbZm1oSsIbotfzOotA)查看操作方法
 
 ## 如果你能适配机型，欢迎提交各类适配机型配置
