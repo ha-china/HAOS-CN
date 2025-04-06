@@ -1,5 +1,5 @@
 # Home Assistant OS 极速版
-为中国地区专门加速的Home Assistant OS，不修改任何系统内的其它任何信息，所有的修改为以加速为目的。系统由GitHub Actions自动构建
+为中国地区专门加速的Home Assistant OS，不修改任何系统内的其它任何信息，所有的修改都以加速为目的。系统由GitHub Actions自动构建
 ## 主要修改
 
 移除了所有国内不稳定或者无法访问的官方自带的加载项源（ [官方加载项](https://github.com/home-assistant/addons) ，[官方社区加载项](https://github.com/hassio-addons/repository) ，[音乐助手](https://github.com/music-assistant/home-assistant-addon)），换成了加速源 [查看链接](https://gitee.com/desmond_GT/hassio-addons)
