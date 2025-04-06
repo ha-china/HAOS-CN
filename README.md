@@ -1,8 +1,8 @@
 # HAOS中国特供版
 为中国地区专门加速的HAOS，不修改任何系统内的其它任何信息，只用来加速。系统由GitHub Actions自动构建
 ## 主要修改
-移除了所有国内不稳定或者无法访问的官方自带的加载项源（ 官方加载项 ，官方社区加载项 ，音乐助手），换成了加速源 查看链接
-集成了极速版HACS(Alone),免github账号，免科学无损使用HACS
+移除了所有国内不稳定或者无法访问的官方自带的加载项源（ [官方加载项](https://github.com/home-assistant/addons) ，[官方社区加载项](https://github.com/hassio-addons/repository) ，[音乐助手](https://github.com/music-assistant/home-assistant-addon)），换成了加速源 [查看链接](https://gitee.com/desmond_GT/hassio-addons)
+同时集成了极速版HACS(Alone)[HACS China](https://github.com/hacs-china), 免github帐号，免科学无损使用HACS
 更新频率从一个月7~8降到一个月一次
 
 ## 测试是否达到测试条件
@@ -48,6 +48,6 @@ sudo qemu-system-x86_64 -m 2048 -smp 2 -drive file=haos_generic-x86-64-15.1.img,
 
 记录整个初始化的时间告诉我
 
-当前版本已经集成了HACS极速版，可以在系统集成里直接添加
+当前版本已经集成了[HACS极速版](https://github.com/hacs-china)，可以在系统集成里直接添加
 
 ## 如果你能适配机型，欢迎提交各类适配机型配置
