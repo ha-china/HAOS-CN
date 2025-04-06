@@ -100,4 +100,4 @@ jobs:
         tag: ${{ env.HASSOS_VERSION }}
         overwrite: true
         file_glob: true
-        body: "国内专用HAOS，对系统无任何修改，只添加国内镜像。公众号：老王杂谈说，欢迎关注"
+        body: "为中国地区专门加速的Home Assistant OS，不修改任何系统内的其它任何信息，所有的修改都以加速为目的。公众号：老王杂谈说，欢迎关注"
