@@ -21,22 +21,14 @@ hacs() {
     if [ ! -d "$hacs_dir" ]; then
         local attempts=0
         local max_attempts=30
-        local github_url="https://gh-proxy.com/github.com/hacs-china/integration/releases/latest/download/hacs.zip"
-        local github="https://gh-proxy.com"
+        local github_url="https://ota.hasscn.top/hacs.zip"
         mkdir -p "$hacs_dir"
         while [ $attempts -lt $max_attempts ]; do
-            http_status=$(curl -s -o /dev/null -w "%{http_code}" "$github")
-            if [ $http_status -eq 200 ]; then
-                rm -rf "$hacs_dir"/*
-                curl --retry 5 --retry-connrefused -C - -L -o "${hacs_dir}hacs.zip" "$github_url" && cd "$hacs_dir" && unzip hacs.zip && rm -rf hacs.zip
-                docker restart homeassistant
-                sleep 5
-                break
-            else
-                attempts=$((attempts + 1))
-                echo "Attempt $attempts: GitHub Accelerator site returned HTTP status $http_status. Retrying in 5 seconds..."
-                sleep 5
-            fi
+            rm -rf "$hacs_dir"/*
+            curl --retry 5 --retry-connrefused -C - -L -o "${hacs_dir}hacs.zip" "$github_url" && cd "$hacs_dir" && unzip hacs.zip && rm -rf hacs.zip
+            docker restart homeassistant
+            sleep 5
+            break
         done
         if [ $attempts -eq $max_attempts ]; then
             echo "Max attempts reached. Exiting..."
