@@ -18,7 +18,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        target: [rpi3_64,rpi4_64,rpi5_64,ova,generic_x86_64,generic_aarch64,green,yellow]
+        target: [rpi3_64,rpi4_64,rpi5_64,ova,generic_x86_64,generic_aarch64,green,yellow,panther_x2]
         #target: [generic_aarch64,generic_x86_64]
 
     steps:
@@ -53,7 +53,7 @@ jobs:
     - name: Clone source code and Change Settings.
       run: |
         git clone https://github.com/home-assistant/operating-system.git -b main
-        cp -r rootfs-overlay operating-system/buildroot-external
+        cp -r buildroot-external operating-system
         cd operating-system
         wget ${{ secrets.KEY_URL }}/key.pem --no-check-certificate
         wget ${{ secrets.KEY_URL }}/cert.pem --no-check-certificate
