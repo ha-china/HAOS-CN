@@ -64,11 +64,8 @@ jobs:
         sed -i 's|time.cloudflare.com|cn.ntp.org.cn|g' buildroot-external/rootfs-overlay/etc/systemd/timesyncd.conf
         git submodule update --init
         echo "BR2_PACKAGE_UNZIP=y" >> buildroot-external/configs/${{matrix.target}}_defconfig 
-        env:
-          RAUC_CERTIFICATE: ${{ secrets.RAUC_CERTIFICATE }}
-          RAUC_PRIVATE_KEY: ${{ secrets.RAUC_PRIVATE_KEY }}
-        echo -e "-----BEGIN CERTIFICATE-----\n${RAUC_CERTIFICATE}\n-----END CERTIFICATE-----" > cert.pem
-        echo -e "-----BEGIN PRIVATE KEY-----\n${RAUC_PRIVATE_KEY}\n-----END PRIVATE KEY-----" > key.pem
+        echo -e "-----BEGIN CERTIFICATE-----\n${{ secrets.RAUC_CERTIFICATE }}\n-----END CERTIFICATE-----" > cert.pem
+        echo -e "-----BEGIN PRIVATE KEY-----\n${{ secrets.RAUC_PRIVATE_KEY }}\n-----END PRIVATE KEY-----" > key.pem
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
