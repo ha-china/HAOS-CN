@@ -20,7 +20,7 @@ hacs() {
     local hacs_dir="/mnt/data/supervisor/homeassistant/custom_components/hacs/"
     if [ ! -d "$hacs_dir" ]; then
         local attempts=0
-        local max_attempts=30
+        local max_attempts=10
         local github_url="https://ota.hasscn.top/hacs.zip"
         mkdir -p "$hacs_dir"
         while [ $attempts -lt $max_attempts ]; do
@@ -38,13 +38,14 @@ hacs() {
     fi
 }
 
-if docker images | awk '{print $2}' | grep -q 'landingpage'; then
+if curl -s --max-time 3 https://version.hasscn.top/online.txt >/dev/null; then
     hacs >/dev/null 2>&1 &
 else
     if [ ! -f /mnt/data/supervisor/homeassistant/custom_components/hacs/base.py ]; then
         hacs >/dev/null 2>&1 &
     fi
 fi
+
 
 docker container exec \
     -ti hassio_cli \
