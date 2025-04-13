@@ -78,13 +78,23 @@ jobs:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
 
-    - name: Build
+    - name: Build 
       shell: 'script -q -e -c "bash {0}"'
       id: build
       run: |
         sleep $((RANDOM % 60))    
         cd operating-system
-        sudo scripts/enter.sh make -j$(($(nproc) + 1)) ${{matrix.target}}
+        max_retries=3
+        count=0
+        until sudo scripts/enter.sh make -j$(($(nproc) + 1)) ${{matrix.target}}; do
+          count=$((count + 1))
+          if [ $count -ge $max_retries ]; then
+            echo "Build failed after $count attempts."
+            exit 1
+          fi
+          echo "Build failed. Retrying in 30s... (Attempt $count/$max_retries)"
+          sleep 30
+        done
         
     - name: Get current date
       id: current_date
