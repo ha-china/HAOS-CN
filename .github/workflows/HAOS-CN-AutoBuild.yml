@@ -63,13 +63,14 @@ jobs:
         sed -i 's|checkonline.home-assistant.io|version.hasscn.top|g' buildroot-external/rootfs-overlay/etc/NetworkManager/NetworkManager.conf
         sed -i 's|time.cloudflare.com|cn.ntp.org.cn|g' buildroot-external/rootfs-overlay/etc/systemd/timesyncd.conf
         sed -i 's|green}_defconfig)|green,panther_x2}_defconfig)|' scripts/update-kernel-upstream.sh
+        echo "BR2_PACKAGE_UNZIP=y" >> buildroot-external/configs/${{matrix.target}}_defconfig 
+        echo "BR2_TARGET_LOCALTIME="Asia/Shanghai" >> buildroot-external/configs/${{matrix.target}}_defconfig 
         if  ${{matrix.target}} == "panther_x2" ; then
           echo 'source "$BR2_EXTERNAL_HASSOS_PATH/package/firmware_ap6236/Config.in"' >> buildroot-external/Config.in
         fi
         
         git submodule update --init
-        echo "BR2_PACKAGE_UNZIP=y" >> buildroot-external/configs/${{matrix.target}}_defconfig 
-        echo "BR2_TARGET_LOCALTIME="Asia/Shanghai" >> buildroot-external/configs/${{matrix.target}}_defconfig 
+
         echo -e "${{ secrets.RAUC_CERTIFICATE }}" > cert.pem
         echo -e "${{ secrets.RAUC_PRIVATE_KEY }}" > key.pem
 

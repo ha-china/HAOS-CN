@@ -5,6 +5,9 @@
 
 - 🛠️ 每个月**27日**系统由 **GitHub Actions** 自动构建。
 ---
+## 为了能让更多的人使用HACS极速版，愿意共享Token的可以点此链接共享
+- https://tokenhub.hacs.vip/
+---
 
 ## 网站 🌐
 🌍 [访问我的网站](https://www.hasscn.top)
