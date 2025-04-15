@@ -47,7 +47,6 @@ jobs:
         sudo apt-get -qq clean -y
         sudo rm -rf "/usr/local/share/boost"
         sudo rm -rf "$AGENT_TOOLSDIRECTORY"
-        #sudo rm -rf /usr/share/
         df -h
 
 
@@ -73,8 +72,6 @@ jobs:
         wget ${{ secrets.CERT_URL }}/cert.pem
         wget ${{ secrets.CERT_URL }}/key.pem
 
-        #echo -e "${{ secrets.RAUC_CERTIFICATE }}" > cert.pem
-        #echo -e "${{ secrets.RAUC_PRIVATE_KEY }}" > key.pem
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
