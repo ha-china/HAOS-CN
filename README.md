@@ -21,7 +21,6 @@
 
 感谢您的支持与关注！如有任何问题，请随时与我联系。
 
-📊 如果你也想加入测试，或者不清楚这个版本是否比官方原版速度快，可以查看[测试文档](Testing.md)进行测试。
 
 **黑豹x2（panther_x2）** 系统适配来源于 https://github.com/jianyun8023/operating-system
 
