@@ -1,0 +1,25 @@
+From f20e38de84d4304d273e42de8a0c6a447a890904 Mon Sep 17 00:00:00 2001
+From: Tim Lunn <tim@feathertop.org>
+Date: Mon, 22 Jan 2024 14:44:54 +1100
+Subject: [PATCH] arm: rockchip: Move RAM disk address past OPTEE region
+
+---
+ include/configs/rv1126_common.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/configs/rv1126_common.h b/include/configs/rv1126_common.h
+index a64c0c6364..6961dbe20b 100644
+--- a/include/configs/rv1126_common.h
++++ b/include/configs/rv1126_common.h
+@@ -26,7 +26,7 @@
+ 	"fdt_addr_r=0x08300000\0" \
+ 	"fdtoverlay_addr_r=0x02000000\0" \
+ 	"kernel_addr_r=0x02008000\0" \
+-	"ramdisk_addr_r=0x0a200000\0"
++	"ramdisk_addr_r=0x0a400000\0"
+ 
+ #include <config_distro_bootcmd.h>
+ #define CFG_EXTRA_ENV_SETTINGS \
+-- 
+2.40.1
+

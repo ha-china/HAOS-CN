@@ -18,7 +18,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        target: [rpi3_64,rpi4_64,rpi5_64,ova,generic_x86_64,generic_aarch64,green,yellow,panther_x2]
+        target: [rpi3_64,rpi4_64,rpi5_64,ova,generic_x86_64,generic_aarch64,green,yellow,panther_x2,ihost]
         #target: [generic_aarch64,generic_x86_64]
 
     steps:
@@ -65,6 +65,11 @@ jobs:
         sed -i 's|green}_defconfig)|green,panther_x2}_defconfig)|' scripts/update-kernel-upstream.sh
         if  ${{matrix.target}} == "panther_x2" ; then
           echo 'source "$BR2_EXTERNAL_HASSOS_PATH/package/firmware_ap6236/Config.in"' >> buildroot-external/Config.in
+        fi
+        if  ${{matrix.target}} == "ihost" ; then
+          echo 'source "$BR2_EXTERNAL_IHOST_PATH/package/matter/Config.in"' >> buildroot-external/Config.in
+        else
+          rm -rf buildroot-external/rootfs-overlay/data/tee
         fi
         
         git submodule update --init
