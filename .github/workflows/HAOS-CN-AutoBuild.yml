@@ -44,106 +44,106 @@ jobs:
         run: echo "Building for ${{ matrix.target }}"
         #target: [generic_aarch64,generic_x86_64]
 
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v3
-      
-    - name: Get HAOS-CN version
-      id: get_haos_version
-      run: |
-        ver=$(curl -s https://version.home-assistant.io/stable.json | jq -r '.hassos."ova"')
-        echo "HASSOS_VERSION=${ver}" >> $GITHUB_ENV
+    #steps:
+      - name: Checkout
+        uses: actions/checkout@v3
         
-    - name: Initialization environment and Free up disk space
-      run: |
-        sudo timedatectl set-timezone "Asia/Shanghai"
-        sudo rm -rf /usr/local/lib/android
-        sudo rm -rf /opt/ghc
-        sudo rm -rf /var/lib/apt/lists/*
-        sudo rm -rf /var/cache/apt/archives/*
-        sudo rm -rf /var/cache/debconf/*-old
-        sudo rm -rf /opt/hostedtoolcache/CodeQL
-        sudo apt clean
-        sudo rm -rf /etc/apt/sources.list.d/*
-        sudo apt-get -qq update -y
-        sudo apt-get -qq autoremove --purge -y
-        sudo apt-get -qq clean -y
-        sudo rm -rf "/usr/local/share/boost"
-        sudo rm -rf "$AGENT_TOOLSDIRECTORY"
-        #sudo rm -rf /usr/share/
-        df -h
-
-
-    - name: Clone source code and Change Settings.
-      run: |
-        git clone https://github.com/home-assistant/operating-system.git -b main
-        cp -r buildroot-external operating-system
-        cd operating-system
-        echo "replace key information"
-        sed -i 's|version.home-assistant.io|version.hasscn.top|g' buildroot-external/package/hassio/hassio.mk
-        sed -i 's|ghcr.io/home-assistant|ghcr.nju.edu.cn/ha-china|g' buildroot-external/package/hassio/dind-import-containers.sh
-        sed -i 's|ghcr.io/home-assistant|ghcr.nju.edu.cn/ha-china|g' buildroot-external/rootfs-overlay/usr/sbin/hassos-supervisor
-        sed -i 's|checkonline.home-assistant.io|version.hasscn.top|g' buildroot-external/rootfs-overlay/etc/NetworkManager/NetworkManager.conf
-        sed -i 's|time.cloudflare.com|cn.ntp.org.cn|g' buildroot-external/rootfs-overlay/etc/systemd/timesyncd.conf
-        sed -i 's|green}_defconfig)|green,panther_x2,ihost}_defconfig)|' scripts/update-kernel-upstream.sh
-        if  ${{matrix.target}} == "panther_x2" ; then
-          echo 'source "$BR2_EXTERNAL_HASSOS_PATH/package/firmware_ap6236/Config.in"' >> buildroot-external/Config.in
-        fi
-        if  ${{matrix.target}} == "ihost" ; then
-          echo 'source "$BR2_EXTERNAL_IHOST_PATH/package/matter/Config.in"' >> buildroot-external/Config.in
-        else
-          rm -rf buildroot-external/rootfs-overlay/data/tee
-        fi
+      - name: Get HAOS-CN version
+        id: get_haos_version
+        run: |
+          ver=$(curl -s https://version.home-assistant.io/stable.json | jq -r '.hassos."ova"')
+          echo "HASSOS_VERSION=${ver}" >> $GITHUB_ENV
         
-        git submodule update --init
-        echo "BR2_PACKAGE_UNZIP=y" >> buildroot-external/configs/${{matrix.target}}_defconfig 
-        echo "BR2_TARGET_LOCALTIME=\"Asia/Shanghai\"" >> buildroot-external/configs/${{matrix.target}}_defconfig
-        echo -e "${{ secrets.RAUC_CERTIFICATE }}" > cert.pem
-        echo -e "${{ secrets.RAUC_PRIVATE_KEY }}" > key.pem
+      - name: Initialization environment and Free up disk space
+        run: |
+          sudo timedatectl set-timezone "Asia/Shanghai"
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /var/lib/apt/lists/*
+          sudo rm -rf /var/cache/apt/archives/*
+          sudo rm -rf /var/cache/debconf/*-old
+          sudo rm -rf /opt/hostedtoolcache/CodeQL
+          sudo apt clean
+          sudo rm -rf /etc/apt/sources.list.d/*
+          sudo apt-get -qq update -y
+          sudo apt-get -qq autoremove --purge -y
+          sudo apt-get -qq clean -y
+          sudo rm -rf "/usr/local/share/boost"
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+          #sudo rm -rf /usr/share/
+          df -h
 
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2
-  
-    - name: Log in to Docker Hub
-      uses: docker/login-action@v2
-      with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
 
-    - name: Build 
-      shell: 'script -q -e -c "bash {0}"'
-      id: build
-      run: |
-        sleep $((RANDOM % 60))    
-        cd operating-system
-        max_retries=3
-        count=0
-        until sudo scripts/enter.sh make -j$(($(nproc) + 1)) ${{matrix.target}}; do
-          count=$((count + 1))
-          if [ $count -ge $max_retries ]; then
-            echo "Build failed after $count attempts."
-            exit 1
+      - name: Clone source code and Change Settings.
+        run: |
+          git clone https://github.com/home-assistant/operating-system.git -b main
+          cp -r buildroot-external operating-system
+          cd operating-system
+          echo "replace key information"
+          sed -i 's|version.home-assistant.io|version.hasscn.top|g' buildroot-external/package/hassio/hassio.mk
+          sed -i 's|ghcr.io/home-assistant|ghcr.nju.edu.cn/ha-china|g' buildroot-external/package/hassio/dind-import-containers.sh
+          sed -i 's|ghcr.io/home-assistant|ghcr.nju.edu.cn/ha-china|g' buildroot-external/rootfs-overlay/usr/sbin/hassos-supervisor
+          sed -i 's|checkonline.home-assistant.io|version.hasscn.top|g' buildroot-external/rootfs-overlay/etc/NetworkManager/NetworkManager.conf
+          sed -i 's|time.cloudflare.com|cn.ntp.org.cn|g' buildroot-external/rootfs-overlay/etc/systemd/timesyncd.conf
+          sed -i 's|green}_defconfig)|green,panther_x2,ihost}_defconfig)|' scripts/update-kernel-upstream.sh
+          if  ${{matrix.target}} == "panther_x2" ; then
+            echo 'source "$BR2_EXTERNAL_HASSOS_PATH/package/firmware_ap6236/Config.in"' >> buildroot-external/Config.in
           fi
-          echo "Build failed. Retrying in 30s... (Attempt $count/$max_retries)"
-          sleep 30
-        done
-        
-    - name: Get current date
-      id: current_date
-      run: |
-        current_date=$(date +'%Y-%m-%d')
-        echo "CURRENT_DATE=${current_date}" >> $GITHUB_ENV
-    
-    - name: Use current date
-      run: echo "Current date is $CURRENT_DATE"
+          if  ${{matrix.target}} == "ihost" ; then
+            echo 'source "$BR2_EXTERNAL_IHOST_PATH/package/matter/Config.in"' >> buildroot-external/Config.in
+          else
+            rm -rf buildroot-external/rootfs-overlay/data/tee
+          fi
+          
+          git submodule update --init
+          echo "BR2_PACKAGE_UNZIP=y" >> buildroot-external/configs/${{matrix.target}}_defconfig 
+          echo "BR2_TARGET_LOCALTIME=\"Asia/Shanghai\"" >> buildroot-external/configs/${{matrix.target}}_defconfig
+          echo -e "${{ secrets.RAUC_CERTIFICATE }}" > cert.pem
+          echo -e "${{ secrets.RAUC_PRIVATE_KEY }}" > key.pem
 
-    - name: Upload images to release
-      id: upload-release
-      uses: svenstaro/upload-release-action@v2
-      with:
-        repo_token: ${{ secrets.UPLOAD_TOKEN }}
-        file: operating-system/output/images/haos_*
-        tag: ${{ env.HASSOS_VERSION }}
-        overwrite: true
-        file_glob: true
-        body: "为中国地区专门加速的Home Assistant OS，不修改任何系统内的其它任何信息，所有的修改都以加速为目的。公众号：老王杂谈说，欢迎关注"
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+    
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build 
+        shell: 'script -q -e -c "bash {0}"'
+        id: build
+        run: |
+          sleep $((RANDOM % 60))    
+          cd operating-system
+          max_retries=3
+          count=0
+          until sudo scripts/enter.sh make -j$(($(nproc) + 1)) ${{matrix.target}}; do
+            count=$((count + 1))
+            if [ $count -ge $max_retries ]; then
+              echo "Build failed after $count attempts."
+              exit 1
+            fi
+            echo "Build failed. Retrying in 30s... (Attempt $count/$max_retries)"
+            sleep 30
+          done
+          
+      - name: Get current date
+        id: current_date
+        run: |
+          current_date=$(date +'%Y-%m-%d')
+          echo "CURRENT_DATE=${current_date}" >> $GITHUB_ENV
+      
+      - name: Use current date
+        run: echo "Current date is $CURRENT_DATE"
+
+      - name: Upload images to release
+        id: upload-release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.UPLOAD_TOKEN }}
+          file: operating-system/output/images/haos_*
+          tag: ${{ env.HASSOS_VERSION }}
+          overwrite: true
+          file_glob: true
+          body: "为中国地区专门加速的Home Assistant OS，不修改任何系统内的其它任何信息，所有的修改都以加速为目的。公众号：老王杂谈说，欢迎关注"
