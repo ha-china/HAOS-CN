@@ -9,21 +9,25 @@ on:
 
   schedule:
     - cron: '0 18 26 * *'
-#  watch:
-#    types: [started]
 
 env:
   RUN_VALIDATION: true
 
 jobs:
-  build:
+  prepare:
     runs-on: ubuntu-latest
-    #runs-on: self-hosted
-    name: Build ${{matrix.target}}
-    strategy:
-      fail-fast: false
-      matrix:
-        target: ${{ fromJSON(github.event_name == 'workflow_dispatch' && format('["{0}"]', join(github.event.inputs.targets.split(','), '","')) || '["rpi3_64","rpi4_64","rpi5_64","ova","generic_x86_64","generic_aarch64","green","yellow","panther_x2","ihost"]') }}
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - id: set-matrix
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            TARGETS="${{ github.event.inputs.targets }}"
+          else
+            TARGETS="rpi3_64,rpi4_64,rpi5_64,ova,generic_x86_64,generic_aarch64,green,yellow,panther_x2,ihost"
+          fi
+          JSON=$(echo "$TARGETS" | jq -R 'split(",")')
+          echo "matrix=$JSON" >> $GITHUB_OUTPUT
         #target: [generic_aarch64,generic_x86_64]
 
     steps:
