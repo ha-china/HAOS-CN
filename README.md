@@ -32,7 +32,7 @@
 
 ---
 
-**机型适配提交请[移步至此]**(https://github.com/ha-china/HAOS-CN-DEV)
+**机型适配提交请**[移步至此](https://github.com/ha-china/HAOS-CN-DEV)
 
 ---
 
