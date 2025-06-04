@@ -9,6 +9,8 @@ on:
 
   schedule:
     - cron: '0 18 26 * *'
+#  watch:
+#    types: [started]
 
 env:
   RUN_VALIDATION: true
@@ -28,6 +30,18 @@ jobs:
           fi
           JSON=$(echo "$TARGETS" | jq -R 'split(",")')
           echo "matrix=$JSON" >> $GITHUB_OUTPUT
+
+  build:
+    needs: prepare
+    runs-on: ubuntu-latest
+    name: Build ${{ matrix.target }}
+    strategy:
+      fail-fast: false
+      matrix:
+        target: ${{ fromJson(needs.prepare.outputs.matrix) }}
+    steps:
+      - name: Echo target
+        run: echo "Building for ${{ matrix.target }}"
         #target: [generic_aarch64,generic_x86_64]
 
     steps:
