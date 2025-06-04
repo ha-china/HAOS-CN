@@ -1,6 +1,11 @@
 name: HAOS-CN
 on:
   workflow_dispatch:
+    inputs:
+      targets:
+        description: 'Targets to build (comma separated)'
+        required: false
+        default: 'rpi3_64,rpi4_64,rpi5_64,ova,generic_x86_64,generic_aarch64,green,yellow,panther_x2,ihost'
 
   schedule:
     - cron: '0 18 26 * *'
@@ -18,7 +23,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        target: [rpi3_64,rpi4_64,rpi5_64,ova,generic_x86_64,generic_aarch64,green,yellow,panther_x2,ihost]
+        target: ${{ github.event_name == 'workflow_dispatch' && fromJSON('["' + join(github.event.inputs.targets.split(','), '","') + '"]') || '[rpi3_64,rpi4_64,rpi5_64,ova,generic_x86_64,generic_aarch64,green,yellow,panther_x2,ihost]' }}
         #target: [generic_aarch64,generic_x86_64]
 
     steps:
