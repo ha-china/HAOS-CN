@@ -26,8 +26,8 @@
 
 感谢您的支持与关注！如有任何问题，请随时与我联系。
 
-
 **黑豹x2（panther_x2）** 系统适配来源于 https://github.com/jianyun8023/operating-system
+**Sonoff iHost** 系统适配来源于 https://github.com/iHost-Open-Source-Project/ha-operating-system
 
 
 ## 如果你觉得这个项目对你有帮助
