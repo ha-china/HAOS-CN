@@ -1,6 +1,6 @@
 ## 🌟 Home Assistant OS 极速版
 
-> 🚀 **专为中国用户优化加速的 Home Assistant OS*
+> 🚀 *专为中国用户优化加速的 Home Assistant OS*
 
 - 🔧 保持系统原生体验，所有更改仅为提速优化。
 - 🛡️ **严禁未经授权及超过10台客户端的企业商用！**
