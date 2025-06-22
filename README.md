@@ -1,4 +1,4 @@
-## 🌟 Home Assistant OS 极速版
+##  ![🌟 Home Assistant OS 极速版](https://img.shields.io/badge/Home%20Assistant%20OS-%E6%9E%81%E9%80%9F%E7%89%88-41BDF5?style=for-the-badge&logo=home-assistant&logoColor=white)
 
 > 🚀 *专为中国用户优化加速的 Home Assistant OS*
 
