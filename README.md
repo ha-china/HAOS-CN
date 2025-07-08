@@ -8,7 +8,7 @@
 - 🏫 `镜像拉取服务`迁移至南京大学节点
 - 🔄 `OTA升级服务`全面迁移至国内节点
 - ⚡ `系统下载地址`优化至国内高速节点
-- 🐳 添加国内 `docker.io` 镜像地址至系统
+- 🐳 添加国内 [`docker.io`](https://github.com/dongyubin/DockerHub)镜像地址至系统
 
 ---
 
@@ -30,6 +30,7 @@
 
 ### 🤖 智能安装体验
 - 🚦 系统启动时**自动**检测网络并安装 ![](https://img.shields.io/badge/HACS-%E6%9E%81%E9%80%9F%E7%89%88-41BDF5?style=for-the-badge&logo=home-assistant&logoColor=white)
+> 为了让更多人体验极速版，欢迎愿意共享 Token 的朋友[点击链接](https://tokenhub.hacs.vip/)共享
 
 ---
 
@@ -52,21 +53,13 @@
 
 ---
 
-### 🤝 HACS 极速版 Token 共享
 
-> 为了让更多人体验极速版，欢迎愿意共享 Token 的朋友点击下方链接：
 
-- [https://tokenhub.hacs.vip/](https://tokenhub.hacs.vip/)
+##  官方信息
 
----
+- 🌐 官方网站：[https://www.hasscn.top](https://www.hasscn.top)
 
-## 🌐 官方网站
-
-- [访问我的网站](https://www.hasscn.top)
-
----
-
-## 📱 官方公众号
+- 📱 官方公众号
 
 <div align="center">
   <img src="./img/WeChat_QRCode.png" alt="关注我" width="400"/>
@@ -84,6 +77,8 @@
 > **机型适配提交请前往：** [点击这里](https://github.com/ha-china/HAOS-CN-DEV)
 
 ---
+
+
 
 ## ☕ 如果你觉得本项目对你有帮助
 
