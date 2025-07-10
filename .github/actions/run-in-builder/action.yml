@@ -1,17 +1,38 @@
 name: "Run command in HAOS build container"
-description: "Run Home Assistant OS make in a build container with retry support"
 inputs:
   image:
     description: "HAOS builder image to use"
     required: true
   target:
-    description: "Build target to pass to make"
+    description: "Target to build"
     required: true
 runs:
   using: "composite"
   steps:
-    - name: Execute build with retry
+    - name: "Run build inside container"
       shell: bash
       run: |
-        chmod +x "${{ github.action_path }}/entrypoint.sh"
-        "${{ github.action_path }}/entrypoint.sh" "${{ inputs.image }}" "${{ inputs.target }}"
+        echo "🧱 Building target: ${{ inputs.target }}"
+        docker run --rm --privileged \
+          -e BUILDER_UID="$(id -u)" \
+          -e BUILDER_GID="$(id -g)" \
+          -v "${GITHUB_WORKSPACE}:/build" \
+          -v "/mnt/cache:/cache" \
+          -v "/mnt/output:/build/output" \
+          ${{ inputs.image }} \
+          bash -c '
+            sleep $((RANDOM % 600))
+            max_retries=3
+            count=0
+            CPU_CORES=$(nproc)
+            JOBS=$((CPU_CORES + 1))
+            until make -j${JOBS} "${{ inputs.target }}"; do
+              count=$((count + 1))
+              if [ $count -ge $max_retries ]; then
+                echo "❌ Build failed after $count attempts."
+                exit 1
+              fi
+              echo "⚠️  Build failed. Retrying in 30s... (Attempt $count/$max_retries)"
+              sleep 30
+            done
+          '
