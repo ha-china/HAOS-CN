@@ -128,8 +128,8 @@ jobs:
         with:
           image: ghcr.io/home-assistant/haos-builder:latest
           command: |
-            sleep $((RANDOM % 600)) 
             bash -c '
+            sleep $((RANDOM % 600)) 
             max_retries=3
             count=0
             CPU_CORES=$(nproc)
