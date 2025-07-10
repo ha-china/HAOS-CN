@@ -87,10 +87,10 @@ jobs:
           sed -i 's|time.cloudflare.com|cn.ntp.org.cn|g' buildroot-external/rootfs-overlay/etc/systemd/timesyncd.conf
           sed -i 's|green}_defconfig)|green,panther_x2,ihost}_defconfig)|' scripts/update-kernel-upstream.sh
           sed -i '/^set -e$/a export FORCE_UNSAFE_CONFIGURE=1' scripts/enter.sh
-          if  ${{matrix.target}} == "panther_x2" ; then
+          if [ "${{matrix.target}}" == "panther_x2" ]; then
             echo 'source "$BR2_EXTERNAL_HASSOS_PATH/package/firmware_ap6236/Config.in"' >> buildroot-external/Config.in
           fi
-          if  ${{matrix.target}} == "ihost" ; then
+          if [ "${{matrix.target}}" == "ihost" ]; then
             echo 'source "$BR2_EXTERNAL_IHOST_PATH/package/matter/Config.in"' >> buildroot-external/Config.in
           else
             rm -rf buildroot-external/rootfs-overlay/data/tee
@@ -121,7 +121,7 @@ jobs:
           cd operating-system
           max_retries=3
           count=0
-          until sudo scripts/enter.sh make -j$(($(nproc) + 1)) ${{matrix.target}}; do
+          until scripts/enter.sh make -j$(($(nproc) + 1)) ${{matrix.target}}; do
             count=$((count + 1))
             if [ $count -ge $max_retries ]; then
               echo "Build failed after $count attempts."
