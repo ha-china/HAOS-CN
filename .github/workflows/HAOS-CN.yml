@@ -143,7 +143,7 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.UPLOAD_TOKEN }}
-          file: output/images/haos_*
+          file: /mnt/output/images/haos_*
           tag: ${{ env.HASSOS_VERSION }}
           overwrite: true
           file_glob: true

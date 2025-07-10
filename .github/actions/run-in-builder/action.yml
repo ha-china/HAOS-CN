@@ -21,12 +21,12 @@ runs:
           -v "/mnt/output:/build/output" \
           ${{ inputs.image }} \
           bash -c '
-            sleep $((RANDOM % 600))
+            sleep $((RANDOM % 60))
             max_retries=3
             count=0
             CPU_CORES=$(nproc)
             JOBS=$((CPU_CORES + 1))
-            until make -j${JOBS} "${{ inputs.target }}_defconfig"; do
+            until make -j${JOBS} -C /build/buildroot O=/build/output BR2_EXTERNAL=/build/buildroot-external "${{ inputs.target }}_defconfig; do
               count=$((count + 1))
               if [ $count -ge $max_retries ]; then
                 echo "❌ Build failed after $count attempts."
