@@ -143,8 +143,13 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.UPLOAD_TOKEN }}
-          file: operating-system/output/images/haos_*
+          file: output/images/haos_*
           tag: ${{ env.HASSOS_VERSION }}
           overwrite: true
           file_glob: true
-          body: "为中国地区专门加速的Home Assistant OS，不修改任何系统内的其它任何信息，所有的修改都以加速为目的。公众号：老王杂谈说，欢迎关注"
+          body: |
+            为中国地区专门加速的 Home Assistant OS，
+            不修改任何系统内的其它任何信息，
+            所有的修改都以加速为目的。
+      
+            公众号：老王杂谈说，欢迎关注！
