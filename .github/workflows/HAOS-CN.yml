@@ -30,7 +30,7 @@ jobs:
             TARGETS="rpi3_64,rpi4_64,rpi5_64,ova,generic_x86_64,generic_aarch64,green,yellow,panther_x2,ihost"
           fi
           JSON=$(echo "$TARGETS" | jq -R -c 'split(",")')
-
+          echo "matrix=$JSON" >> $GITHUB_OUTPUT
 
   build:
     needs: prepare
@@ -123,24 +123,25 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
       
 
-      - name: Build 
-        shell: 'script -q -e -c "bash {0}"'
-        id: build
-        run: |
-          sleep $((RANDOM % 600))    
-          cd operating-system
-
-          max_retries=3
-          count=0
-          until sudo  env "FORCE_UNSAFE_CONFIGURE=1" scripts/enter.sh make -j$(($(nproc) + 1)) ${{matrix.target}}; do
-            count=$((count + 1))
-            if [ $count -ge $max_retries ]; then
-              echo "Build failed after $count attempts."
-              exit 1
-            fi
-            echo "Build failed. Retrying in 30s... (Attempt $count/$max_retries)"
-            sleep 30
-          done
+      - name: Build with retry
+        uses: ./.github/actions/run-in-builder
+        with:
+          image: ghcr.io/home-assistant/haos-builder:latest
+          command: |
+            sleep $((RANDOM % 600)) 
+            bash -c '
+            max_retries=3
+            count=0
+            until make -j$(($(nproc) + 1)) ${{ matrix.target }}; do
+              count=$((count + 1))
+              if [ $count -ge $max_retries ]; then
+                echo "Build failed after $count attempts."
+                exit 1
+              fi
+              echo "Build failed. Retrying in 30s... (Attempt $count/$max_retries)"
+              sleep 30
+            done
+            '
           
       - name: Get current date
         id: current_date
