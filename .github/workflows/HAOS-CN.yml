@@ -30,7 +30,7 @@ jobs:
             TARGETS="rpi3_64,rpi4_64,rpi5_64,ova,generic_x86_64,generic_aarch64,green,yellow,panther_x2,ihost"
           fi
           JSON=$(echo "$TARGETS" | jq -R -c 'split(",")')
-          echo "matrix=$JSON" >> $GITHUB_OUTPUT
+
 
   build:
     needs: prepare
@@ -132,7 +132,7 @@ jobs:
 
           max_retries=3
           count=0
-          until sudo scripts/enter.sh make -j$(($(nproc) + 1)) ${{matrix.target}}; do
+          until sudo  env "FORCE_UNSAFE_CONFIGURE=1" scripts/enter.sh make -j$(($(nproc) + 1)) ${{matrix.target}}; do
             count=$((count + 1))
             if [ $count -ge $max_retries ]; then
               echo "Build failed after $count attempts."
