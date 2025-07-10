@@ -14,7 +14,6 @@ on:
 
 env:
   RUN_VALIDATION: true
-#  FORCE_UNSAFE_CONFIGURE: 1
 
 jobs:
   prepare:
@@ -47,14 +46,13 @@ jobs:
 
     #steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
         
       - name: Get HAOS-CN version
         id: get_haos_version
         run: |
           ver=$(curl -s https://version.home-assistant.io/stable.json | jq -r '.hassos."ova"')
           echo "HASSOS_VERSION=${ver}" >> $GITHUB_ENV
-          echo "FORCE_UNSAFE_CONFIGURE=1" >> $GITHUB_ENV
         
       - name: Initialization environment and Free up disk space
         run: |
@@ -73,14 +71,6 @@ jobs:
           sudo rm -rf "/usr/local/share/boost"
           sudo rm -rf "$AGENT_TOOLSDIRECTORY"
           #sudo rm -rf /usr/share/
-          sudo mkdir /mnt/cache
-          sudo mkdir /mnt/output
-          WORKSPACE_OWNER="$(stat -c '%U:%G' "${GITHUB_WORKSPACE}")"
-          # output directory is symlinked for easier access from workspace
-          # but for build container it must be mounted as a volume
-          sudo ln -sf /mnt/output "${GITHUB_WORKSPACE}/output"
-          sudo chown -R "${WORKSPACE_OWNER}" /mnt/cache
-          sudo chown -R "${WORKSPACE_OWNER}" /mnt/output
           df -h
 
 
@@ -96,10 +86,11 @@ jobs:
           sed -i 's|checkonline.home-assistant.io|version.hasscn.top|g' buildroot-external/rootfs-overlay/etc/NetworkManager/NetworkManager.conf
           sed -i 's|time.cloudflare.com|cn.ntp.org.cn|g' buildroot-external/rootfs-overlay/etc/systemd/timesyncd.conf
           sed -i 's|green}_defconfig)|green,panther_x2,ihost}_defconfig)|' scripts/update-kernel-upstream.sh
-          if [ "${{matrix.target}}" == "panther_x2" ]; then
+          sed -i '/^set -e$/a export FORCE_UNSAFE_CONFIGURE=1' scripts/enter.sh
+          if  ${{matrix.target}} == "panther_x2" ; then
             echo 'source "$BR2_EXTERNAL_HASSOS_PATH/package/firmware_ap6236/Config.in"' >> buildroot-external/Config.in
           fi
-          if [ "${{matrix.target}}" == "ihost" ]; then
+          if  ${{matrix.target}} == "ihost" ; then
             echo 'source "$BR2_EXTERNAL_IHOST_PATH/package/matter/Config.in"' >> buildroot-external/Config.in
           else
             rm -rf buildroot-external/rootfs-overlay/data/tee
@@ -121,13 +112,24 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-      
 
-      - name: Build with retry
-        uses: ./.github/actions/run-in-builder
-        with:
-          image: ghcr.io/home-assistant/haos-builder:latest
-          target: ${{ matrix.target }}
+      - name: Build 
+        shell: 'script -q -e -c "bash {0}"'
+        id: build
+        run: |
+          sleep $((RANDOM % 600))    
+          cd operating-system
+          max_retries=3
+          count=0
+          until sudo scripts/enter.sh make -j$(($(nproc) + 1)) ${{matrix.target}}; do
+            count=$((count + 1))
+            if [ $count -ge $max_retries ]; then
+              echo "Build failed after $count attempts."
+              exit 1
+            fi
+            echo "Build failed. Retrying in 30s... (Attempt $count/$max_retries)"
+            sleep 30
+          done
           
       - name: Get current date
         id: current_date
@@ -143,13 +145,8 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.UPLOAD_TOKEN }}
-          file: /mnt/output/images/haos_*
+          file: operating-system/output/images/haos_*
           tag: ${{ env.HASSOS_VERSION }}
           overwrite: true
           file_glob: true
-          body: |
-            为中国地区专门加速的 Home Assistant OS，
-            不修改任何系统内的其它任何信息，
-            所有的修改都以加速为目的。
-      
-            公众号：老王杂谈说，欢迎关注！
+          body: "为中国地区专门加速的Home Assistant OS，不修改任何系统内的其它任何信息，所有的修改都以加速为目的。公众号：老王杂谈说，欢迎关注"
