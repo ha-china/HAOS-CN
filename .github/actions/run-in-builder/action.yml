@@ -1,25 +1,17 @@
 name: "Run command in HAOS build container"
-description: "Run arbitrary command in the official HAOS builder container"
-
+description: "Run Home Assistant OS make in a build container with retry support"
 inputs:
   image:
     description: "HAOS builder image to use"
     required: true
-  command:
-    description: "Command to run in the container"
+  target:
+    description: "Build target to pass to make"
     required: true
-
 runs:
   using: "composite"
   steps:
-    - name: Run command in HAOS build container
+    - name: Execute build with retry
       shell: bash
       run: |
-        docker run --rm --privileged \
-          -e BUILDER_UID="$(id -u)" \
-          -e BUILDER_GID="$(id -g)" \
-          -v "${GITHUB_WORKSPACE}:/build" \
-          -v "/mnt/cache:/cache" \
-          -v "/mnt/output:/build/output" \
-          ${{ inputs.image }} \
-          bash -c "${{ inputs.command }}"
+        chmod +x "${{ github.action_path }}/entrypoint.sh"
+        "${{ github.action_path }}/entrypoint.sh" "${{ inputs.image }}" "${{ inputs.target }}"

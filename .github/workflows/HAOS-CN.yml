@@ -127,23 +127,7 @@ jobs:
         uses: ./.github/actions/run-in-builder
         with:
           image: ghcr.io/home-assistant/haos-builder:latest
-          command: |
-            bash -c '
-            sleep $((RANDOM % 600)) 
-            max_retries=3
-            count=0
-            CPU_CORES=$(nproc)
-            JOBS=$((CPU_CORES + 1))
-            until make -j${JOBS} ${{ matrix.target }}; do
-              count=$((count + 1))
-              if [ $count -ge $max_retries ]; then
-                echo "Build failed after $count attempts."
-                exit 1
-              fi
-              echo "Build failed. Retrying in 30s... (Attempt $count/$max_retries)"
-              sleep 30
-            done
-            '
+          target: ${{ matrix.target }}
           
       - name: Get current date
         id: current_date
