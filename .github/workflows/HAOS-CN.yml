@@ -132,7 +132,8 @@ jobs:
             bash -c '
             max_retries=3
             count=0
-            until make -j$(($(nproc) + 1)) ${{ matrix.target }}; do
+            CPU_CORES=$(nproc)
+            until make -j$((CPU_CORES + 1)) ${{ matrix.target }}; do
               count=$((count + 1))
               if [ $count -ge $max_retries ]; then
                 echo "Build failed after $count attempts."
