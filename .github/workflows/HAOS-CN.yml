@@ -119,7 +119,7 @@ jobs:
         run: |
           sleep $((RANDOM % 600))    
           cd operating-system
-          FORCE_UNSAFE_CONFIGURE=1
+          export FORCE_UNSAFE_CONFIGURE=1
           max_retries=3
           count=0
           until sudo scripts/enter.sh make -j$(($(nproc) + 1)) ${{matrix.target}}; do
