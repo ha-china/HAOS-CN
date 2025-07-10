@@ -14,7 +14,7 @@ on:
 
 env:
   RUN_VALIDATION: true
-  FORCE_UNSAFE_CONFIGURE: 1
+#  FORCE_UNSAFE_CONFIGURE: 1
 
 jobs:
   prepare:
@@ -121,7 +121,7 @@ jobs:
           cd operating-system
           max_retries=3
           count=0
-          until sudo scripts/enter.sh make -j$(($(nproc) + 1)) ${{matrix.target}}; do
+          until FORCE_UNSAFE_CONFIGURE=1 sudo scripts/enter.sh make -j$(($(nproc) + 1)) ${{matrix.target}}; do
             count=$((count + 1))
             if [ $count -ge $max_retries ]; then
               echo "Build failed after $count attempts."
