@@ -91,7 +91,7 @@ jobs:
             echo 'source "$BR2_EXTERNAL_HASSOS_PATH/package/firmware_ap6236/Config.in"' >> buildroot-external/Config.in
           fi
           if [ "${{matrix.target}}" == "ihost" ]; then
-            echo 'source "$BR2_EXTERNAL_IHOST_PATH/package/matter/Config.in"' >> buildroot-external/Config.in
+            echo 'source "$BR2_EXTERNAL_HASSOS_PATH/package/matter/Config.in"' >> buildroot-external/Config.in
           else
             rm -rf buildroot-external/rootfs-overlay/data/tee
           fi
