@@ -119,9 +119,10 @@ jobs:
         run: |
           sleep $((RANDOM % 600))    
           cd operating-system
+          FORCE_UNSAFE_CONFIGURE=1
           max_retries=3
           count=0
-          until FORCE_UNSAFE_CONFIGURE=1 sudo scripts/enter.sh make -j$(($(nproc) + 1)) ${{matrix.target}}; do
+          until sudo scripts/enter.sh make -j$(($(nproc) + 1)) ${{matrix.target}}; do
             count=$((count + 1))
             if [ $count -ge $max_retries ]; then
               echo "Build failed after $count attempts."
