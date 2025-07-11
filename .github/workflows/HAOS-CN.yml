@@ -92,8 +92,10 @@ jobs:
           fi
           if [ "${{matrix.target}}" == "ihost" ]; then
             echo 'source "$BR2_EXTERNAL_HASSOS_PATH/package/matter/Config.in"' >> buildroot-external/Config.in
+            cp -r buildroot-external/board/sonoff/rootfs-overlay/* buildroot-external/rootfs-overlay/
             cp -r buildroot-external/board/sonoff/0001-CMD-read-string-from-fileinto-env.patch buildroot-external/patches/uboot/0001-CMD-read-string-from-fileinto-env.patch
-            cp -r
+
+
           fi
           
           git submodule update --init
