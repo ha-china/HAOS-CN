@@ -1,0 +1,13 @@
+[Unit]
+Description=Set ALSA volume and output mux on startup
+After=sound.target
+After=hassos-supervisor.service
+Requires=sound.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/set-audio.sh
+RemainAfterExit=true
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,80 @@
+diff --git a/arch/arm/boot/dts/rockchip/rv1126-sonoff-ihost.dtsi b/arch/arm/boot/dts/rockchip/rv1126-sonoff-ihost.dtsi
+index bc0ff9a8e..303377a4e 100644
+--- a/arch/arm/boot/dts/rockchip/rv1126-sonoff-ihost.dtsi
++++ b/arch/arm/boot/dts/rockchip/rv1126-sonoff-ihost.dtsi
+@@ -37,6 +37,30 @@
+ 		regulator-max-microvolt = <5000000>;
+ 	};
+ 
++	rk809-sound {
++		compatible = "simple-audio-card";
++		simple-audio-card,format = "i2s";
++		simple-audio-card,name = "Analog RK809";
++		simple-audio-card,mclk-fs = <256>;
++
++		simple-audio-card,widgets =
++			"Headphone", "Headphones",
++			"Speaker", "Speaker";
++		simple-audio-card,routing =
++			"Headphones", "HPOL",
++			"Headphones", "HPOR",
++			"Speaker", "SPKO";
++
++		simple-audio-card,cpu {
++			sound-dai = <&i2s0>;
++			#sound-dai-cells = <0>;
++		};
++
++		simple-audio-card,codec {
++			sound-dai = <&rk809>;
++		};
++	};
++
+ 	sdio_pwrseq: pwrseq-sdio {
+ 		compatible = "mmc-pwrseq-simple";
+ 		clocks = <&rk809 1>;
+@@ -69,11 +93,16 @@
+ 		reg = <0x20>;
+ 		interrupt-parent = <&gpio0>;
+ 		interrupts = <RK_PB1 IRQ_TYPE_LEVEL_LOW>;
++		assigned-clocks = <&cru MCLK_I2S0_TX_OUT2IO>;
++		assigned-clock-parents = <&cru MCLK_I2S0_TX>;
+ 		#clock-cells = <1>;
++		clock-names = "mclk";
++		clocks = <&cru MCLK_I2S0_TX_OUT2IO>;
+ 		clock-output-names = "rk808-clkout1", "rk808-clkout2";
+ 		pinctrl-names = "default";
+-		pinctrl-0 = <&pmic_int_l>;
++		pinctrl-0 = <&pmic_int_l>, <&i2s0m0_mclk>;
+ 		rockchip,system-power-controller;
++		#sound-dai-cells = <0>;
+ 		wakeup-source;
+ 
+ 		vcc1-supply = <&vcc5v0_sys>;
+@@ -256,6 +285,7 @@
+ 				regulator-boot-on;
+ 			};
+ 		};
++
+ 	};
+ };
+ 
+@@ -273,6 +303,18 @@
+ 	};
+ };
+ 
++&i2s0 {
++	status = "okay";
++	#sound-dai-cells = <0>;
++	rockchip,clk-trcm = <1>;
++	rockchip,i2s-rx-route = <3 1 2 0>;
++	pinctrl-names = "default";
++	pinctrl-0 = <&i2s0m0_sclk_tx>,
++		     <&i2s0m0_lrck_tx>,
++		     <&i2s0m0_sdo0>,
++		     <&i2s0m0_sdo1_sdi3>;
++};
++
+ &gmac {
+ 	assigned-clocks = <&cru CLK_GMAC_SRC_M1>, <&cru CLK_GMAC_SRC>,
+ 			  <&cru CLK_GMAC_TX_RX>;

@@ -20,3 +20,20 @@ function hassos_pre_image() {
 function hassos_post_image() {
     convert_disk_image_xz
 }
+
+
+function disk_size_fixup() {
+    if grep -q ^BR2_PACKAGE_HASSIO_FULL_CORE=y "${BASE_DIR}/.config"; then
+        echo "${FULL_DISK_SIZE}"
+    else
+        echo "${DISK_SIZE}"
+    fi
+}
+
+function data_size_fixup() {
+    if grep -q ^BR2_PACKAGE_HASSIO_DATA_IMAGE_SIZE "${BASE_DIR}/.config"; then
+        echo "${BR2_PACKAGE_HASSIO_DATA_IMAGE_SIZE}"
+    else
+        echo "1280M"
+    fi
+}

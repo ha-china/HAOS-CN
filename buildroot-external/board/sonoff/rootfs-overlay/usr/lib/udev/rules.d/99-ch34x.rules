@@ -1,0 +1,77 @@
+# WCH CH342 USB/Serial converter
+ACTION=="add", SUBSYSTEM=="usb", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="55d2", \
+        ATTR{bInterfaceNumber}=="0[02]", DRIVER=="cdc_acm", \
+	MODE="0660", GROUP="plugdev", \
+	RUN+="/bin/sh -c 'echo %k > /sys/bus/usb/drivers/cdc_acm/unbind'", \
+	RUN+="/bin/sh -c 'echo %k > /sys/bus/usb/drivers/usb_ch343/bind'" 
+
+# WCH CH343 USB/Serial converter
+ACTION=="add", SUBSYSTEM=="usb", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="55d3", \
+        DRIVER=="cdc_acm", \
+	MODE="0660", GROUP="plugdev", \
+	RUN+="/bin/sh -c 'echo %k > /sys/bus/usb/drivers/cdc_acm/unbind'", \
+	RUN+="/bin/sh -c 'echo %k > /sys/bus/usb/drivers/usb_ch343/bind'" 
+
+# WCH CH344 USB/Serial converter
+ACTION=="add", SUBSYSTEM=="usb", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="55d5", \
+        ATTR{bInterfaceNumber}=="0[0246]", DRIVER=="cdc_acm", \
+	MODE="0660", GROUP="plugdev", \
+	RUN+="/bin/sh -c 'echo %k > /sys/bus/usb/drivers/cdc_acm/unbind'", \
+	RUN+="/bin/sh -c 'echo %k > /sys/bus/usb/drivers/usb_ch343/bind'" 
+
+# WCH CH347T Mode0 USB/Serial converter
+ACTION=="add", SUBSYSTEM=="usb", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="55da", \
+        ATTR{bInterfaceNumber}=="0[02]", DRIVER=="cdc_acm", \
+	MODE="0660", GROUP="plugdev", \
+	RUN+="/bin/sh -c 'echo %k > /sys/bus/usb/drivers/cdc_acm/unbind'", \
+	RUN+="/bin/sh -c 'echo %k > /sys/bus/usb/drivers/usb_ch343/bind'" 
+
+# WCH CH347T Mode1 USB/Serial converter
+ACTION=="add", SUBSYSTEM=="usb", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="55db", \
+        ATTR{bInterfaceNumber}=="00", DRIVER=="cdc_acm", \
+	MODE="0660", GROUP="plugdev", \
+	RUN+="/bin/sh -c 'echo %k > /sys/bus/usb/drivers/cdc_acm/unbind'", \
+	RUN+="/bin/sh -c 'echo %k > /sys/bus/usb/drivers/usb_ch343/bind'" 
+
+# WCH CH347T Mode3 USB/Serial converter
+ACTION=="add", SUBSYSTEM=="usb", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="55dd", \
+        ATTR{bInterfaceNumber}=="00", DRIVER=="cdc_acm", \
+	MODE="0660", GROUP="plugdev", \
+	RUN+="/bin/sh -c 'echo %k > /sys/bus/usb/drivers/cdc_acm/unbind'", \
+	RUN+="/bin/sh -c 'echo %k > /sys/bus/usb/drivers/usb_ch343/bind'" 
+
+# WCH CH347T UART0 & UART1 USB/Serial converter
+ACTION=="add", SUBSYSTEM=="usb", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="55de", \
+        ATTR{bInterfaceNumber}=="0[02]", DRIVER=="cdc_acm", \
+	MODE="0660", GROUP="plugdev", \
+	RUN+="/bin/sh -c 'echo %k > /sys/bus/usb/drivers/cdc_acm/unbind'", \
+	RUN+="/bin/sh -c 'echo %k > /sys/bus/usb/drivers/usb_ch343/bind'" 
+
+# WCH CH9101 USB/Serial converter
+ACTION=="add", SUBSYSTEM=="usb", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="55d8", \
+        DRIVER=="cdc_acm", \
+	MODE="0660", GROUP="plugdev", \
+	RUN+="/bin/sh -c 'echo %k > /sys/bus/usb/drivers/cdc_acm/unbind'", \
+	RUN+="/bin/sh -c 'echo %k > /sys/bus/usb/drivers/usb_ch343/bind'" 
+
+# WCH CH9102 USB/Serial converter
+ACTION=="add", SUBSYSTEM=="usb", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="55d4", \
+        DRIVER=="cdc_acm", \
+	MODE="0660", GROUP="plugdev", \
+	RUN+="/bin/sh -c 'echo %k > /sys/bus/usb/drivers/cdc_acm/unbind'", \
+	RUN+="/bin/sh -c 'echo %k > /sys/bus/usb/drivers/usb_ch343/bind'" 
+
+# WCH CH9103 USB/Serial converter
+ACTION=="add", SUBSYSTEM=="usb", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="55d7", \
+        ATTR{bInterfaceNumber}=="0[02]", DRIVER=="cdc_acm", \
+	MODE="0660", GROUP="plugdev", \
+	RUN+="/bin/sh -c 'echo %k > /sys/bus/usb/drivers/cdc_acm/unbind'", \
+	RUN+="/bin/sh -c 'echo %k > /sys/bus/usb/drivers/usb_ch343/bind'" 
+
+# WCH CH9104 USB/Serial converter
+ACTION=="add", SUBSYSTEM=="usb", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="55df", \
+        ATTR{bInterfaceNumber}=="0[0246]", DRIVER=="cdc_acm", \
+	MODE="0660", GROUP="plugdev", \
+	RUN+="/bin/sh -c 'echo %k > /sys/bus/usb/drivers/cdc_acm/unbind'", \
+	RUN+="/bin/sh -c 'echo %k > /sys/bus/usb/drivers/usb_ch343/bind'" 
+
