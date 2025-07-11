@@ -79,6 +79,7 @@ jobs:
           git clone https://github.com/home-assistant/operating-system.git -b main
           cp -r buildroot-external operating-system
           cd operating-system
+          git submodule update --init
           echo "replace key information"
           sed -i 's|version.home-assistant.io|version.hasscn.top|g' buildroot-external/package/hassio/hassio.mk
           sed -i 's|ghcr.io/home-assistant|ghcr.nju.edu.cn/ha-china|g' buildroot-external/package/hassio/dind-import-containers.sh
@@ -94,11 +95,10 @@ jobs:
             echo 'source "$BR2_EXTERNAL_HASSOS_PATH/package/matter/Config.in"' >> buildroot-external/Config.in
             cp -r buildroot-external/board/sonoff/rootfs-overlay/* buildroot-external/rootfs-overlay/
             cp -r buildroot-external/board/sonoff/0001-CMD-read-string-from-fileinto-env.patch buildroot-external/patches/uboot/0001-CMD-read-string-from-fileinto-env.patch
-
-
+            ls -l buildroot-external/package/
           fi
           
-          git submodule update --init
+          
           sed -i 's|Etc/UTC|Asia/Shanghai|g' buildroot/system/Config.in
 
           echo "BR2_PACKAGE_UNZIP=y" >> buildroot-external/configs/${{matrix.target}}_defconfig 
