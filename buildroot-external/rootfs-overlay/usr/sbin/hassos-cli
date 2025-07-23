@@ -5,6 +5,8 @@
 
 echo "Waiting for the Home Assistant CLI to be ready..."
 echo "This is an open source version, commercial use without permission is prohibited"
+echo "Official Website: https://www.hasscn.top"
+
 
 i=0
 while [ ! "$(docker ps -q -f name=hassio_cli)" ]; do

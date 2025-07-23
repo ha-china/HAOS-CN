@@ -21,11 +21,11 @@
 ---
 
 ### 📦 加载项优化
-- ❌ 移除不稳定的 `官方加载项源`
-- ❌ 移除不稳定的 `官方社区源`
-- ❌ 移除不稳定的 `Music Assistant 源`
-- ❌ 移除不稳定的 `ESP Home 源`
-- ✅ 添加经过全面优化与汉化的`默认加载项源`（上述移除内容均已包含在内）
+- ❌ 移除不稳定的 [`官方加载项源`](https://github.com/home-assistant/addons)
+- ❌ 移除不稳定的 [`官方社区源`](https://github.com/hassio-addons/repository)
+- ❌ 移除不稳定的 [`Music Assistant 源`](https://github.com/music-assistant/home-assistant-addon)
+- ❌ 移除不稳定的 [`ESP Home 源`](https://github.com/esphome/home-assistant-addon)
+- ✅ 添加经过全面优化与汉化的[`加载项源`](https://gitee.com/desmond_GT/hassio-addons/blob/main/README.md)为默认加载项源（上述移除内容均已包含在内）
 
 ---
 
