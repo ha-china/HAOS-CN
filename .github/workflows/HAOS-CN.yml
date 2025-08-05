@@ -91,6 +91,9 @@ jobs:
           if [ "${{matrix.target}}" == "panther_x2" ]; then
             echo 'source "$BR2_EXTERNAL_HASSOS_PATH/package/firmware_ap6236/Config.in"' >> buildroot-external/Config.in
           fi
+          if [ "${{matrix.target}}" == "orangepi_cm4" ]; then
+            echo 'source "$BR2_EXTERNAL_HASSOS_PATH/package/firmware_ap6256/Config.in"' >> buildroot-external/Config.in
+          fi
           if [ "${{matrix.target}}" == "ihost" ]; then
             echo 'source "$BR2_EXTERNAL_HASSOS_PATH/package/matter/Config.in"' >> buildroot-external/Config.in
             cp -r buildroot-external/board/sonoff/rootfs-overlay/* buildroot-external/rootfs-overlay/

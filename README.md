@@ -72,6 +72,7 @@
 
 - **黑豹x2（panther_x2）** 适配来源：[https://github.com/jianyun8023/operating-system](https://github.com/jianyun8023/operating-system)
 - **Sonoff iHost** 适配来源：[https://github.com/iHost-Open-Source-Project/ha-operating-system](https://github.com/iHost-Open-Source-Project/ha-operating-system)
+- **Orangepi CM4** 适配来源：[https://github.com/hhuangpeiqi/home-assistant-OS](https://github.com/hhuangpeiqi/home-assistant-OS)
 
 ---
 
