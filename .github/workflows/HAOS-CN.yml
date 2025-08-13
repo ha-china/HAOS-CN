@@ -51,7 +51,7 @@ jobs:
       - name: Get HAOS-CN version
         id: get_haos_version
         run: |
-          ver=$(curl -s https://version.home-assistant.io/stable.json | jq -r '.hassos."ova"')
+          ver=$(curl -s https://api.github.com/repos/home-assistant/operating-system/releases/latest | jq -r '.tag_name')
           echo "HASSOS_VERSION=${ver}" >> $GITHUB_ENV
         
       - name: Initialization environment and Free up disk space
