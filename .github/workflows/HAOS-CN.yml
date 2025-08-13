@@ -5,7 +5,7 @@ on:
       targets:
         description: 'Targets to build (comma separated)'
         required: false
-        default: 'rpi3_64,rpi4_64,rpi5_64,ova,generic_x86_64,generic_aarch64,green,yellow,panther_x2,ihost'
+        default: 'rpi3_64,rpi4_64,rpi5_64,ova,generic_x86_64,generic_aarch64,green,yellow,panther_x2,ihost,orangepi_cm4'
 
   schedule:
     - cron: '0 18 26 * *'
