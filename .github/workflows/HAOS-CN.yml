@@ -46,7 +46,7 @@ jobs:
 
     #steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
         
       - name: Get HAOS-CN version
         id: get_haos_version
