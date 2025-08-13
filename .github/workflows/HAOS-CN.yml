@@ -26,7 +26,7 @@ jobs:
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             TARGETS="${{ github.event.inputs.targets }}"
           else
-            TARGETS="rpi3_64,rpi4_64,rpi5_64,ova,generic_x86_64,generic_aarch64,green,yellow,panther_x2,ihost"
+            TARGETS="rpi3_64,rpi4_64,rpi5_64,ova,generic_x86_64,generic_aarch64,green,yellow,panther_x2,ihost,orangepi_cm4"
           fi
           JSON=$(echo "$TARGETS" | jq -R -c 'split(",")')
           echo "matrix=$JSON" >> $GITHUB_OUTPUT
