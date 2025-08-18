@@ -1,6 +1,7 @@
 ##  ![Home Assistant OS 极速版](https://img.shields.io/badge/Home%20Assistant%20OS-%E6%9E%81%E9%80%9F%E7%89%88-41BDF5?style=for-the-badge&logo=home-assistant&logoColor=white) ![Home Assistant OS China](https://img.shields.io/badge/Home%20Assistant%20OS-China-41BDF5?style=for-the-badge&logo=home-assistant&logoColor=white) ![Home Assistant OS Turbo](https://img.shields.io/badge/Home%20Assistant%20OS-Turbo-41BDF5?style=for-the-badge&logo=home-assistant&logoColor=white)
 ### [`Changelog`](https://www.hasscn.top/Changelog.html)
 
+[English](README_EN.md) **中文**
 
 ### 🚀 网络加速优化
 - 🕵️‍♂️ `版本检测服务`迁移至国内阿里BGP节点
