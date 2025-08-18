@@ -3,6 +3,8 @@
 
 [中文](README.md) **English**
 
+**This system is optimized based on the official Home Assistant [repository](https://github.com/home-assistant/operating-system)**
+
 ### 🚀 Network Acceleration Optimization
 - 🕵️‍♂️ `Version check service` migrated to Alibaba BGP node in China
 - 🛡️ `System network check` migrated to Alibaba BGP node in China
