@@ -83,7 +83,9 @@ jobs:
           echo "replace key information"
           sed -i 's|version.home-assistant.io|version.hasscn.top|g' buildroot-external/package/hassio/hassio.mk
           sed -i 's|ghcr.io/home-assistant|ghcr.nju.edu.cn/ha-china|g' buildroot-external/package/hassio/dind-import-containers.sh
+          sed -i 's|version.home-assistant.io|version.hasscn.top|g' buildroot-external/rootfs-overlay/usr/libexec/hassos-apparmor
           sed -i 's|ghcr.io/home-assistant|ghcr.nju.edu.cn/ha-china|g' buildroot-external/rootfs-overlay/usr/sbin/hassos-supervisor
+          sed -i 's|version.home-assistant.io|version.hasscn.top|g' buildroot-external/rootfs-overlay/usr/sbin/hassos-supervisor
           sed -i 's|checkonline.home-assistant.io|version.hasscn.top|g' buildroot-external/rootfs-overlay/etc/NetworkManager/NetworkManager.conf
           sed -i 's|time.cloudflare.com|cn.ntp.org.cn|g' buildroot-external/rootfs-overlay/etc/systemd/timesyncd.conf
           sed -i 's|green}_defconfig)|green,panther_x2,ihost,orangepi_cm4}_defconfig)|' scripts/update-kernel-upstream.sh

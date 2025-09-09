@@ -3,17 +3,16 @@
 # Run logging cli
 # ==============================================================================
 
-echo "Waiting for the Home Assistant CLI to be ready..."
-echo "This is an open source version, commercial use without permission is prohibited"
-echo "Official Website: https://www.hasscn.top"
-
+echo -e "\033[33mWaiting for the Home Assistant CLI to be ready...\033[0m"
+echo -e "\033[31mThis is an open source version, commercial use without permission is prohibited\033[0m"
+echo -e "Official Website: \033[32mhttps://www.hasscn.top\033[0m"
 
 i=0
 while [ ! "$(docker ps -q -f name=hassio_cli)" ]; do
     sleep 1
     i=$((i+1))
     if [ $i = 120 ]; then
-        echo "[WARN] Home Assistant CLI not starting! Jump into emergency console..."
+        echo -e "\033[31m[WARN] Home Assistant CLI not starting! Jump into emergency console...\033[0m"
         exec /bin/ash -l
     fi
 done
@@ -24,11 +23,11 @@ hacs() {
     if [ ! -d "$hacs_dir" ]; then
         local attempts=0
         local max_attempts=10
-        local github_url="https://ota.hasscn.top/hacs.zip"
+        local hacs_url="https://ota.hasscn.top/hacs.zip"
         mkdir -p "$hacs_dir"
         while [ $attempts -lt $max_attempts ]; do
             rm -rf "$hacs_dir"/*
-            curl --retry 5 --retry-connrefused -C - -L -o "${hacs_dir}hacs.zip" "$github_url" && cd "$hacs_dir" && unzip hacs.zip && rm -rf hacs.zip
+            curl --retry 5 --retry-connrefused -C - -L -o "${hacs_dir}hacs.zip" "$hacs_url" && cd "$hacs_dir" && unzip hacs.zip && rm -rf hacs.zip
             docker restart homeassistant
             sleep 5
             break
