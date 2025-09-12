@@ -1,0 +1,68 @@
+#!/bin/sh
+# ==============================================================================
+# HassOS partition expander
+# ==============================================================================
+set -e
+
+DEVICE_CHILD="$(findfs LABEL="hassos-data")"
+DEVICE_CHILD_NAME="$(basename "${DEVICE_CHILD}")"
+DEVICE_ROOT_NAME="$(lsblk -no pkname "${DEVICE_CHILD}")"
+DEVICE_ROOT="/dev/${DEVICE_ROOT_NAME}"
+PART_NUM="$(cat "/sys/class/block/${DEVICE_CHILD_NAME}/partition")"
+
+# Get partition label type
+PART_TABLE="$(sfdisk -lqJ "${DEVICE_ROOT}")"
+PART_LABEL="$(echo "${PART_TABLE}" | jq -r '.partitiontable.label')"
+echo "[INFO] Checking if expanding data partition on ${DEVICE_CHILD} is necessary"
+
+if [ "${PART_LABEL}" = "gpt" ]; then
+    echo "[INFO] Detected GPT partition label on ${DEVICE_ROOT}"
+
+    if sfdisk --verify "${DEVICE_ROOT}" 2>&1 | grep "The backup GPT table is not on the end of the device."; then
+        echo "[INFO] Moving GPT backup header to the end"
+        sfdisk --relocate gpt-bak-std "${DEVICE_ROOT}"
+
+        # Reload partition label to get correct .partitiontable.lastlba
+        PART_TABLE="$(sfdisk -lqJ "${DEVICE_ROOT}")"
+    fi
+    LAST_USABLE_LBA="$(echo "${PART_TABLE}" | jq -r '.partitiontable.lastlba')"
+else
+    echo "[INFO] Detected MBR partition label on ${DEVICE_ROOT}"
+
+    # For MBR, we have to calculate the last usable sector by ourselfs
+    DEVICE_SIZE=$(blockdev --getsize64 "${DEVICE_ROOT}")
+    LAST_USABLE_LBA=$(echo "${PART_TABLE}" | jq -r "${DEVICE_SIZE} / .partitiontable.sectorsize")
+fi
+echo "[INFO] Last usable logical block ${LAST_USABLE_LBA}"
+
+# Calculate end of data partition
+JQ_FILTER=".partitiontable.partitions[] | select ( .node == \"${DEVICE_CHILD}\" ) | .start + .size"
+DATA_PARTITION_END="$(echo "${PART_TABLE}" | jq "${JQ_FILTER}")"
+echo "[INFO] Data partition end block ${DATA_PARTITION_END}"
+
+# Need resize? Ignore free space if its less than 8MB/64MB (4k sectors) since
+# that could be partition alignment rounding...
+UNUSED_BLOCKS=$(( LAST_USABLE_LBA - DATA_PARTITION_END ))
+if [ "${UNUSED_BLOCKS}" -le "16384" ]; then
+    echo "[INFO] No resize of data partition needed"
+    exit 0
+fi
+
+echo "[INFO] Update hassos-data partition ${PART_NUM}"
+echo ", +" | sfdisk --no-reread --no-tell-kernel -N "${PART_NUM}" "${DEVICE_ROOT}"
+sfdisk -V "${DEVICE_ROOT}"
+
+# Update the kernel's partition table
+partx -u "${DEVICE_ROOT}"
+udevadm settle
+
+# Make sure /dev/disk/by-label/hassos-data is actually present before exiting.
+# This avoids a race condition with mnt-data.mount which might fail to bind
+# otherwise:
+# Bound to unit dev-disk-by\x2dlabel-hassos\x2ddata.device, but unit isn't active.
+if ! systemctl start "dev-disk-by\\x2dlabel-hassos\\x2ddata.device"; then
+    echo "[ERROR] Data partition not found!"
+    exit 1
+fi
+
+echo "[INFO] Finished hassos-data partition resizing"

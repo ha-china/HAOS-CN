@@ -1,0 +1,12 @@
+{
+    "storage-driver": "overlay2",
+    "log-driver": "journald",
+    "experimental": true,
+    "ip6tables": true,
+    "log-opts": {
+        "tag": "{{.Name}}"
+    },
+    "data-root": "/mnt/data/docker",
+    "deprecated-key-path": "/mnt/overlay/etc/docker/key.json",
+    "bip": "172.30.232.1/23"
+}

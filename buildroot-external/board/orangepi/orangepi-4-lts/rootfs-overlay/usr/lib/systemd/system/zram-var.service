@@ -1,0 +1,15 @@
+[Unit]
+Description=HassOS ZRAM var
+DefaultDependencies=no
+Before=var.mount
+RefuseManualStart=true
+RefuseManualStop=true
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/hassos-zram -t fs -m var -s 32M
+RemainAfterExit=true
+StandardOutput=null
+
+[Install]
+WantedBy=hassos-zram.target
