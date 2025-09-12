@@ -1,0 +1,192 @@
+From 4eb5f12bdb2e2fd14386abcc01a88fde151477cd Mon Sep 17 00:00:00 2001
+From: Tim Lunn <tim@feathertop.org>
+Date: Mon, 22 Jan 2024 14:42:02 +1100
+Subject: [PATCH] arm: rockchip: Add Sonoff iHost board
+
+---
+ arch/arm/dts/rv1126-sonoff-ihost-u-boot.dtsi | 16 ++++++
+ arch/arm/mach-rockchip/rv1126/Kconfig        |  4 ++
+ board/sonoff/ihost/Kconfig                   | 16 ++++++
+ board/sonoff/ihost/MAINTAINERS               |  6 ++
+ configs/sonoff-ihost-rv1126_defconfig        | 60 ++++++++++++++++++++
+ include/configs/sonoff-ihost.h               | 21 +++++++
+ 6 files changed, 123 insertions(+)
+ create mode 100644 arch/arm/dts/rv1126-sonoff-ihost-u-boot.dtsi
+ create mode 100644 board/sonoff/ihost/Kconfig
+ create mode 100644 board/sonoff/ihost/MAINTAINERS
+ create mode 100644 configs/sonoff-ihost-rv1126_defconfig
+ create mode 100644 include/configs/sonoff-ihost.h
+
+diff --git a/arch/arm/dts/rv1126-sonoff-ihost-u-boot.dtsi b/arch/arm/dts/rv1126-sonoff-ihost-u-boot.dtsi
+new file mode 100644
+index 0000000000..d1b84af26e
+--- /dev/null
++++ b/arch/arm/dts/rv1126-sonoff-ihost-u-boot.dtsi
+@@ -0,0 +1,16 @@
++// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
++/*
++ * Copyright (c) 2022 Edgeble AI Technologies Pvt. Ltd.
++ */
++
++#include "rv1126-u-boot.dtsi"
++
++/ {
++	chosen {
++		u-boot,spl-boot-order = "same-as-spl", &sdmmc, &emmc;
++	};
++};
++
++&sdio {
++	status = "disabled";
++};
+diff --git a/arch/arm/mach-rockchip/rv1126/Kconfig b/arch/arm/mach-rockchip/rv1126/Kconfig
+index a6e2b5903c..3c00a950cb 100644
+--- a/arch/arm/mach-rockchip/rv1126/Kconfig
++++ b/arch/arm/mach-rockchip/rv1126/Kconfig
+@@ -14,6 +14,9 @@ config TARGET_RV1126_NEU2
+ 	  IO board and Neu2 needs to mount on top of this IO board in order to
+ 	  create complete Edgeble Neural Compute Module 2(Neu2) IO platform.
+ 
++config TARGET_RV1126_SONOFF_IHOST
++	bool "Sonoff iHost smart home hub"
++
+ config SOC_SPECIFIC_OPTIONS # dummy
+ 	def_bool y
+ 	select HAS_CUSTOM_SYS_INIT_SP_ADDR
+@@ -58,5 +61,6 @@ config TEXT_BASE
+ 	default 0x600000
+ 
+ source board/edgeble/neural-compute-module-2/Kconfig
++source board/sonoff/ihost/Kconfig
+ 
+ endif
+diff --git a/board/sonoff/ihost/Kconfig b/board/sonoff/ihost/Kconfig
+new file mode 100644
+index 0000000000..30d9a6b3e6
+--- /dev/null
++++ b/board/sonoff/ihost/Kconfig
+@@ -0,0 +1,16 @@
++if TARGET_RV1126_SONOFF_IHOST
++
++config SYS_BOARD
++	default "sonoff-ihost"
++
++config SYS_VENDOR
++	default "itead"
++
++config SYS_CONFIG_NAME
++	default "sonoff-ihost"
++
++config BOARD_SPECIFIC_OPTIONS # dummy
++	def_bool y
++	select RAM_ROCKCHIP_DDR4
++
++endif
+diff --git a/board/sonoff/ihost/MAINTAINERS b/board/sonoff/ihost/MAINTAINERS
+new file mode 100644
+index 0000000000..89b8b7b37e
+--- /dev/null
++++ b/board/sonoff/ihost/MAINTAINERS
+@@ -0,0 +1,6 @@
++RV1126-SONOFF-IHOST
++M:      Tim Lunn <tim@feathertop.org>	
++S:	Maintained
++F:	board/itead/sonoff-ihost
++F:	include/configs/sonoff-ihost.h
++F:	configs/sonoff-ihost-rv1126_defconfig
+diff --git a/configs/sonoff-ihost-rv1126_defconfig b/configs/sonoff-ihost-rv1126_defconfig
+new file mode 100644
+index 0000000000..fe99bd92f9
+--- /dev/null
++++ b/configs/sonoff-ihost-rv1126_defconfig
+@@ -0,0 +1,60 @@
++CONFIG_ARM=y
++CONFIG_SPL_SKIP_LOWLEVEL_INIT_ONLY=y
++CONFIG_TPL_SKIP_LOWLEVEL_INIT_ONLY=y
++CONFIG_COUNTER_FREQUENCY=24000000
++CONFIG_SYS_ARCH_TIMER=y
++CONFIG_ARCH_ROCKCHIP=y
++CONFIG_NR_DRAM_BANKS=1
++CONFIG_DEFAULT_DEVICE_TREE="rv1126-sonoff-ihost"
++CONFIG_SYS_MONITOR_LEN=614400
++CONFIG_ROCKCHIP_RV1126=y
++CONFIG_TARGET_RV1126_SONOFF_IHOST=y
++CONFIG_DEBUG_UART_BASE=0xff570000
++CONFIG_DEBUG_UART_CLOCK=24000000
++CONFIG_SYS_LOAD_ADDR=0xe00800
++CONFIG_DEBUG_UART=y
++CONFIG_FIT_VERBOSE=y
++CONFIG_NR_DRAM_BANKS=2
++CONFIG_SPL_FIT=y
++CONFIG_SPL_LOAD_FIT=y
++# CONFIG_USE_SPL_FIT_GENERATOR is not set
++CONFIG_SYS_BOOTM_LEN=0x4000000
++CONFIG_DEFAULT_FDT_FILE="rv1126-sonoff-ihost.dtb"
++# CONFIG_DISPLAY_CPUINFO is not set
++CONFIG_DISPLAY_BOARDINFO_LATE=y
++CONFIG_SPL_PAD_TO=0x7f8000
++CONFIG_SPL_NO_BSS_LIMIT=y
++# CONFIG_SPL_RAW_IMAGE_SUPPORT is not set
++# CONFIG_SPL_SHARES_INIT_SP_ADDR is not set
++# CONFIG_CMD_BOOTD is not set
++# CONFIG_CMD_ELF is not set
++# CONFIG_CMD_IMI is not set
++# CONFIG_CMD_XIMG is not set
++CONFIG_CMD_GPT=y
++# CONFIG_CMD_LOADB is not set
++# CONFIG_CMD_LOADS is not set
++CONFIG_CMD_MMC=y
++# CONFIG_CMD_ITEST is not set
++# CONFIG_CMD_SETEXPR is not set
++# CONFIG_SPL_DOS_PARTITION is not set
++# CONFIG_ISO_PARTITION is not set
++CONFIG_EFI_PARTITION_ENTRIES_NUMBERS=64
++CONFIG_OF_SPL_REMOVE_PROPS="clock-names interrupt-parent assigned-clocks assigned-clock-rates assigned-clock-parents"
++CONFIG_ENV_IS_IN_MMC=y
++CONFIG_SYS_RELOC_GD_ENV_ADDR=y
++CONFIG_ROCKCHIP_GPIO=y
++CONFIG_SYS_I2C_ROCKCHIP=y
++CONFIG_MISC=y
++CONFIG_MMC_DW=y
++CONFIG_MMC_DW_ROCKCHIP=y
++CONFIG_REGULATOR_PWM=y
++CONFIG_PWM_ROCKCHIP=y
++# CONFIG_RAM_ROCKCHIP_DEBUG is not set
++CONFIG_BAUDRATE=1500000
++CONFIG_DEBUG_UART_SHIFT=2
++CONFIG_SYSRESET=y
++# CONFIG_TPL_SYSRESET is not set
++CONFIG_DM_THERMAL=y
++CONFIG_SPL_TINY_MEMSET=y
++CONFIG_LZO=y
++CONFIG_ERRNO_STR=y
+diff --git a/include/configs/sonoff-ihost.h b/include/configs/sonoff-ihost.h
+new file mode 100644
+index 0000000000..be04b5c7df
+--- /dev/null
++++ b/include/configs/sonoff-ihost.h
+@@ -0,0 +1,21 @@
++/* SPDX-License-Identifier: GPL-2.0+ */
++/*
++ * Copyright (c) 2022 Edgeble AI Technologies Pvt. Ltd.
++ */
++
++#ifndef __SONOFF_IHOST_H
++#define __SONOFF_IHOST_H
++
++#define ROCKCHIP_DEVICE_SETTINGS \
++		"stdout=serial\0" \
++		"stderr=serial\0"
++
++#include <configs/rv1126_common.h>
++
++#undef BOOT_TARGET_DEVICES
++
++#define BOOT_TARGET_DEVICES(func) \
++	func(MMC, mmc, 0) \
++	func(MMC, mmc, 1)
++
++#endif /* __NEURAL_COMPUTE_MODULE_2_H */
+-- 
+2.40.1
+

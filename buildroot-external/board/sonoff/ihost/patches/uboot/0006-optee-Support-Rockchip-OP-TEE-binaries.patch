@@ -1,0 +1,58 @@
+From a15ceca8e5c02df6ffc9ae0a953bef5227de2c2d Mon Sep 17 00:00:00 2001
+From: Alex Bee <knaerzche@gmail.com>
+Date: Tue, 18 Jul 2023 16:57:15 +0200
+Subject: [PATCH] optee: Support Rockchip OP-TEE binaries
+
+Currently the only ARM Rockchip SoC which is supported by upstream
+optee-os is RK322x. For all other ARM SoCs a
+vendor-provided OP-TEE binary has to be used to have a TEE available.
+Those are using a calling convension different from upstream optee-os.
+
+This introduces CONFIG_ROCKCHIP_OPTEE_BINARY which signals that any
+of those vendor binaries is used and changes the calling convension
+accordingly.
+
+Signed-off-by: Alex Bee <knaerzche@gmail.com>
+Rejected upstream as vendor specific
+---
+ arch/arm/mach-rockchip/Kconfig | 8 ++++++++
+ common/spl/spl_optee.S         | 4 ++++
+ 2 files changed, 12 insertions(+)
+
+diff --git a/arch/arm/mach-rockchip/Kconfig b/arch/arm/mach-rockchip/Kconfig
+index cce118a004..7cc35d621b 100644
+--- a/arch/arm/mach-rockchip/Kconfig
++++ b/arch/arm/mach-rockchip/Kconfig
+@@ -451,6 +451,14 @@ config ROCKCHIP_BOOT_MODE_REG
+ 	  The Soc will enter to different boot mode(defined in asm/arch-rockchip/boot_mode.h)
+ 	  according to the value from this register.
+ 
++config ROCKCHIP_OPTEE_BINARY
++	bool "Use a OP-TEE binary provided by Rockchip"
++	depends on SPL_OPTEE_IMAGE
++	default y if ROCKCHIP_RK3036 || ROCKCHIP_RK3128 || ROCKCHIP_RK3288 || ROCKCHIP_RV1126
++	help
++	  This option enables the usage of vendor-provided OP-TEE binaries.
++	  Say Y if you are using OP-TEE binary provided by Rockchip.
++
+ config ROCKCHIP_RK8XX_DISABLE_BOOT_ON_POWERON
+ 	bool "Disable device boot on power plug-in"
+ 	depends on PMIC_RK8XX
+diff --git a/common/spl/spl_optee.S b/common/spl/spl_optee.S
+index a269904d38..ea41d8adb6 100644
+--- a/common/spl/spl_optee.S
++++ b/common/spl/spl_optee.S
+@@ -7,6 +7,10 @@
+ #include <asm/assembler.h>
+ 
+ ENTRY(spl_optee_entry)
++#ifdef CONFIG_ROCKCHIP_OPTEE_BINARY
++	ldr r1, =CONFIG_TEXT_BASE
++#else
+ 	ldr lr, =CONFIG_TEXT_BASE
++#endif
+ 	mov pc, r3
+ ENDPROC(spl_optee_entry)
+-- 
+2.40.1
+

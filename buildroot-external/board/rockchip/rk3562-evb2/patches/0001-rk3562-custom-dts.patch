@@ -1,0 +1,93 @@
+diff --git a/arch/arm64/boot/dts/rockchip/rk3562-evb2.dts b/arch/arm64/boot/dts/rockchip/rk3562-evb2.dts
+--- /dev/null	(date 1741336516554)
++++ b/arch/arm64/boot/dts/rockchip/rk3562-evb2.dts	(date 1741336516554)
+@@ -0,0 +1,24 @@
+/dts-v1/;
+/ {
+    #address-cells = <1>;
+    #size-cells = <1>;
+    compatible = "rockchip,rk3562-evb2", "rockchip,rk3562";
+
+    chosen {
+        bootargs = "console=ttyFIQ0,115200n8 earlycon=uart8250,mmio32,0xff1a0000";
+    };
+
+    aliases {
+        serial0 = &uart0;
+        serial1 = &uart3;
+        mmc0 = &sdmmc0;
+        mmc1 = &sdmmc1;
+    };
+};
+
+
+&gmac0 {
+    status = "okay";
+    pinctrl-names = "default";
+    pinctrl-0 = <&ethm0_pins>;
+    phy-mode = "rgmii";
+    tx-delay = <0x10>;
+    rx-delay = <0x2f>;
+};
+
+&gmac1 {
+    status = "okay";
+    pinctrl-names = "default";
+    pinctrl-0 = <&ethm1_pins>;
+    phy-mode = "rgmii";
+    tx-delay = <0x10>;
+    rx-delay = <0x2f>;
+};
+
+&sdmmc0 {
+    status = "okay";
+    bus-width = <4>;
+    cap-sdio-irq;
+    supports-sdio;
+    sd-uhs-sdr104;
+    vmmc-supply = <&vcc3v3_sys>;
+    vqmmc-supply = <&vcc_1v8>;
+};
+
+&sdmmc1 {
+    status = "disabled";
+};
+
+&sdhci {
+    status = "okay";
+    bus-width = <8>;
+    non-removable;
+    cap-mmc-highspeed;
+    mmc-hs200-1_8v;
+    vmmc-supply = <&vcc3v3_sys>;
+    vqmmc-supply = <&vcc_1v8>;
+};
+
+&usbdrd {
+    status = "okay";
+};
+
+&usbdrd_dwc3 {
+    status = "okay";
+};
+
+&uart0 {
+    status = "okay";
+    pinctrl-names = "default";
+    pinctrl-0 = <&uart0m0_xfer>;
+};
+
+&uart3 {
+    status = "okay";
+    pinctrl-names = "default";
+    pinctrl-0 = <&uart3m0_xfer>;
+    linux,rs485-enabled-at-boot-time;
+    rs485-rts-delay = <0 0>;
+    rts-gpios = <&gpio0 0x14 GPIO_ACTIVE_HIGH>;
+};
+
+&pinctrl {
+    rs485_pins {
+        rockchip,pins = <0 0x14 0 &pcfg_pull_none>;
+    };
+};

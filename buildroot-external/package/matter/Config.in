@@ -1,0 +1,4 @@
+config BR2_PACKAGE_MATTER
+    bool "matter support"
+    help
+      matter support

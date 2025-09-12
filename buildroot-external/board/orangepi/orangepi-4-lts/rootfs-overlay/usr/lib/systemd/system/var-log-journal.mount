@@ -1,0 +1,15 @@
+[Unit]
+Description=Systemd persistent logging
+Requires=mnt-data.mount
+After=mnt-data.mount
+Before=systemd-journal-flush.service
+
+[Mount]
+What=/mnt/data/logs
+Where=/var/log/journal
+Type=None
+Options=bind
+LazyUnmount=yes
+
+[Install]
+WantedBy=hassos-bind.target

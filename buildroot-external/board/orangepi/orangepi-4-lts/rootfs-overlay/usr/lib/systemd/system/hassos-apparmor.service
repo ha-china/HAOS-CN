@@ -1,0 +1,14 @@
+[Unit]
+Description=HassOS AppArmor
+Wants=network-online.target time-sync.target
+After=network-online.target time-sync.target
+Before=docker.service
+RequiresMountsFor=/mnt/data
+
+[Service]
+Type=oneshot
+RemainAfterExit=true
+ExecStart=/usr/libexec/hassos-apparmor
+
+[Install]
+WantedBy=multi-user.target

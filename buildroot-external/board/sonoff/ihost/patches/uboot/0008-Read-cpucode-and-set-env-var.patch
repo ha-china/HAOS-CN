@@ -1,0 +1,114 @@
+From 1fc536e9fd95005f9493ab70be62c0e30b202fb9 Mon Sep 17 00:00:00 2001
+From: Tim Lunn <tim@feathertop.org>
+Date: Tue, 7 Nov 2023 15:18:37 +1100
+Subject: [PATCH] Read cpucode and set env var
+
+---
+ arch/arm/dts/rv1126-u-boot.dtsi           |  3 +++
+ arch/arm/include/asm/arch-rockchip/misc.h |  1 +
+ arch/arm/mach-rockchip/board.c            | 11 +++++++++++
+ arch/arm/mach-rockchip/misc.c             | 17 +++++++++++++++++
+ drivers/misc/rockchip-otp.c               |  1 +
+ 5 files changed, 33 insertions(+)
+
+diff --git a/arch/arm/dts/rv1126-u-boot.dtsi b/arch/arm/dts/rv1126-u-boot.dtsi
+index 4485980135..536facabf3 100644
+--- a/arch/arm/dts/rv1126-u-boot.dtsi
++++ b/arch/arm/dts/rv1126-u-boot.dtsi
+@@ -23,6 +23,9 @@
+ 		#size-cells = <1>;
+ 		status = "okay";
+ 
++		cpu_code: code@2 {
++			reg = <0x02 0x2>;
++		};
+ 		cpu_id: id@7 {
+ 			reg = <0x07 0x10>;
+ 		};
+diff --git a/arch/arm/include/asm/arch-rockchip/misc.h b/arch/arm/include/asm/arch-rockchip/misc.h
+index 4155af8c3b..dad63408dd 100644
+--- a/arch/arm/include/asm/arch-rockchip/misc.h
++++ b/arch/arm/include/asm/arch-rockchip/misc.h
+@@ -9,6 +9,7 @@
+ int rockchip_cpuid_from_efuse(const u32 cpuid_offset,
+ 			      const u32 cpuid_length,
+ 			      u8 *cpuid);
++int rockchip_cpucode_set(const u8 *cpucode, const u32 cpucode_length);
+ int rockchip_cpuid_set(const u8 *cpuid, const u32 cpuid_length);
+ int rockchip_setup_macaddr(void);
+ void rockchip_capsule_update_board_setup(void);
+diff --git a/arch/arm/mach-rockchip/board.c b/arch/arm/mach-rockchip/board.c
+index 2620530e03..7561fe4fdd 100644
+--- a/arch/arm/mach-rockchip/board.c
++++ b/arch/arm/mach-rockchip/board.c
+@@ -299,8 +299,11 @@ int fastboot_set_reboot_flag(enum fastboot_reboot_reason reason)
+ #ifdef CONFIG_MISC_INIT_R
+ __weak int misc_init_r(void)
+ {
++	const u32 cpucode_offset = 0x02;
++	const u32 cpucode_length = 0x02;
+ 	const u32 cpuid_offset = CFG_CPUID_OFFSET;
+ 	const u32 cpuid_length = 0x10;
++	u8 cpucode[cpucode_length];
+ 	u8 cpuid[cpuid_length];
+ 	int ret;
+ 
+@@ -312,6 +315,14 @@ __weak int misc_init_r(void)
+ 	if (ret)
+ 		return ret;
+ 
++	ret = rockchip_cpuid_from_efuse(cpucode_offset, cpucode_length, cpucode);
++	if (ret)
++		return ret;
++
++	ret = rockchip_cpucode_set(cpucode, cpucode_length);
++	if (ret)
++		return ret;
++
+ 	ret = rockchip_setup_macaddr();
+ 
+ 	return ret;
+diff --git a/arch/arm/mach-rockchip/misc.c b/arch/arm/mach-rockchip/misc.c
+index 7d03f0c2b6..e0496da2e1 100644
+--- a/arch/arm/mach-rockchip/misc.c
++++ b/arch/arm/mach-rockchip/misc.c
+@@ -1,3 +1,4 @@
++#define LOG_DEBUG
+ /* SPDX-License-Identifier: GPL-2.0+ */
+ /*
+  * RK3399: Architecture common definitions
+@@ -92,6 +93,22 @@ int rockchip_cpuid_from_efuse(const u32 cpuid_offset,
+ 	return 0;
+ }
+ 
++int rockchip_cpucode_set(const u8 *cpucode, const u32 cpucode_length)
++{
++	char cpucode_str[cpucode_length * 2 + 1];
++	int i;
++
++	memset(cpucode_str, 0, sizeof(cpucode_str));
++	for (i = 0; i < 2; i++)
++		sprintf(&cpucode_str[i * 2], "%02x", cpucode[i]);
++
++	debug("cpu code: %s\n", cpucode_str);
++
++	env_set("cpucode#", cpucode_str);
++
++	return 0;
++}
++
+ int rockchip_cpuid_set(const u8 *cpuid, const u32 cpuid_length)
+ {
+ 	u8 low[cpuid_length / 2], high[cpuid_length / 2];
+diff --git a/drivers/misc/rockchip-otp.c b/drivers/misc/rockchip-otp.c
+index 4f757083a1..b0f4960500 100644
+--- a/drivers/misc/rockchip-otp.c
++++ b/drivers/misc/rockchip-otp.c
+@@ -1,3 +1,4 @@
++#define DEBUG
+ // SPDX-License-Identifier: GPL-2.0
+ /*
+  * Copyright (c) 2019 Fuzhou Rockchip Electronics Co., Ltd
+-- 
+2.40.1
+

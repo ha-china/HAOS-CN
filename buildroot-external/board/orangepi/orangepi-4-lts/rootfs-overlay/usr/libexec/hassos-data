@@ -1,0 +1,49 @@
+#!/bin/sh
+# ==============================================================================
+# Home Assistant OS data partition migration script
+# ==============================================================================
+set -e
+
+# Rely on systemd-udev symlinks to find current data partition by fs label
+OLD_DEVICE_CHILD="$(readlink -f "/dev/disk/by-label/hassos-data")"
+
+# We cannot rely on systemd Wants/Requires since this is evaluated before
+# ConditionPathExists, and would make us wait for an external device on
+# every boot.
+# Instead, just start the unit here, which makes sure a device with the
+# partlabel "hassos-data-external" is present.
+if ! systemctl start "dev-disk-by\\x2dpartlabel-hassos\\x2ddata\\x2dexternal.device"; then
+    echo "[ERROR] External data device ${NEW_DEVICE} not found!"
+    exit 1
+fi
+
+# Rely on systemd-udev symlinks to find external data partition by partlabel
+NEW_DEVICE_CHILD="$(readlink -f "/dev/disk/by-partlabel/hassos-data-external")"
+
+# Check if target device is the current device
+if [ "${NEW_DEVICE_CHILD}" = "${OLD_DEVICE_CHILD}" ]; then
+    echo "[ERROR] Home Assitant OS is already using this external data device!"
+    exit 1
+fi
+
+NEW_DEVICE_PART_SIZE=$(cat "/sys/class/block/$(basename "${NEW_DEVICE_CHILD}")/size")
+OLD_DEVICE_PART_SIZE=$(cat "/sys/class/block/$(basename "${OLD_DEVICE_CHILD}")/size")
+if [ "${NEW_DEVICE_PART_SIZE}" -lt "${OLD_DEVICE_PART_SIZE}" ]; then
+    echo "[ERROR] Target device too small!"
+    exit 1
+fi
+
+echo "[INFO] Moving data from ${OLD_DEVICE_CHILD} to ${NEW_DEVICE_CHILD}"
+if ! e2image -ra -p "${OLD_DEVICE_CHILD}" "${NEW_DEVICE_CHILD}"; then
+    echo "[ERROR] Copying data partition to external device failed!"
+    # Rename partition to make sure HAOS does not try to mount a failed copy attempt.
+    e2label "${NEW_DEVICE_CHILD}" hassos-data-fail || true
+    exit 1
+fi
+
+# At this point we have two partition with the same fs label. Make sure
+# to rename the internal partition so we won't mount it anymore.
+echo "[INFO] Rename old hassos-data partition ${OLD_DEVICE_CHILD}"
+e2label "${OLD_DEVICE_CHILD}" hassos-data-old
+
+echo "[INFO] Data move has been completed successfully"

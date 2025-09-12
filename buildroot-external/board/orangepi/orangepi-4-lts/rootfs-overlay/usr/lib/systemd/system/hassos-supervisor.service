@@ -1,0 +1,21 @@
+[Unit]
+Description=HassOS supervisor
+Requires=docker.service rauc.service dbus.socket
+Wants=network-online.target hassos-apparmor.service time-sync.target systemd-journal-gatewayd.socket
+After=docker.service rauc.service dbus.socket network-online.target hassos-apparmor.service time-sync.target systemd-journal-gatewayd.socket
+RequiresMountsFor=/mnt/data /mnt/boot /mnt/overlay
+StartLimitIntervalSec=30m
+StartLimitBurst=3
+ConditionPathExists=/run/dbus/system_bus_socket
+ConditionPathExists=/run/docker.sock
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=5s
+ExecStartPre=-/usr/bin/docker stop hassio_supervisor
+ExecStart=/usr/sbin/hassos-supervisor
+ExecStop=-/usr/bin/docker stop hassio_supervisor
+
+[Install]
+WantedBy=multi-user.target

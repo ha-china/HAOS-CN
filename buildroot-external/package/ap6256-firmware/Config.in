@@ -1,0 +1,4 @@
+config BR2_PACKAGE_AP6256_FIRMWARE
+    bool "Broadcom BCM43456 Wi-Fi & Bluetooth firmware"
+    help
+      Custom firmware files for BCM43456 on RK3566 (Orange Pi CM4).
