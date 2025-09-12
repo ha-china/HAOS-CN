@@ -1,0 +1,16 @@
+[Unit]
+Description=HA OVER iHost TEE supplicant
+After=mnt-data.mount
+Requires=mnt-data.mount
+RequiresMountsFor=/mnt/data
+
+[Service]
+Type=simple
+Restart=always
+ExecStartPre=/usr/bin/mkdir -p /mnt/data/tee
+ExecStartPre=/usr/bin/chown tee-supplicant:tee-supplicant /mnt/data/tee
+ExecStartPre=/usr/bin/chmod 750 /mnt/data/tee
+ExecStart=/usr/bin/tee-supplicant
+
+[Install]
+WantedBy=multi-user.target

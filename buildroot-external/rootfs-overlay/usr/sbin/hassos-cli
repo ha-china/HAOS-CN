@@ -1,0 +1,71 @@
+#!/bin/sh
+# ==============================================================================
+# Run logging cli
+# ==============================================================================
+
+echo -e "\033[33mWaiting for the Home Assistant CLI to be ready...\033[0m"
+echo -e "\033[31mThis is an open source version, commercial use without permission is prohibited\033[0m"
+echo -e "Official Website: \033[32mhttps://www.hasscn.top\033[0m"
+
+i=0
+while [ ! "$(docker ps -q -f name=hassio_cli)" ]; do
+    sleep 1
+    i=$((i+1))
+    if [ $i = 120 ]; then
+        echo -e "\033[31m[WARN] Home Assistant CLI not starting! Jump into emergency console...\033[0m"
+        exec /bin/ash -l
+    fi
+done
+
+hacs() {
+    echo "Installing HACS China..."
+    local hacs_dir="/mnt/data/supervisor/homeassistant/custom_components/hacs/"
+    if [ ! -d "$hacs_dir" ]; then
+        local attempts=0
+        local max_attempts=10
+        local hacs_url="https://ota.hasscn.top/hacs.zip"
+        mkdir -p "$hacs_dir"
+        while [ $attempts -lt $max_attempts ]; do
+            rm -rf "$hacs_dir"/*
+            curl --retry 5 --retry-connrefused -C - -L -o "${hacs_dir}hacs.zip" "$hacs_url" && cd "$hacs_dir" && unzip hacs.zip && rm -rf hacs.zip
+            docker restart homeassistant
+            sleep 5
+            break
+        done
+        if [ $attempts -eq $max_attempts ]; then
+            echo "Max attempts reached. Exiting..."
+        fi
+    else
+        echo "HACS directory already exists. Nothing to do."
+    fi
+}
+
+if curl -s --max-time 3 https://version.hasscn.top/online.txt >/dev/null; then
+    hacs >/dev/null 2>&1 &
+else
+    if [ ! -f /mnt/data/supervisor/homeassistant/custom_components/hacs/base.py ]; then
+        hacs >/dev/null 2>&1 &
+    fi
+fi
+
+
+docker container exec \
+    -ti hassio_cli \
+    /usr/bin/cli.sh
+
+case $? in
+  10)
+    # Jump to root login shell (login command)
+    exec /bin/ash -l
+    ;;
+  143)
+    # 143 graceful termination (SIGTERM). Most likely a proper shutdown.
+    # Just sleep for a while until actual systemd shutdown gets invoked.
+    echo ""
+    echo "Home Assistant CLI has been terminated."
+    sleep 30
+    ;;
+  *)
+    echo "HA CLI failed with error code: $?"
+    ;;
+esac

@@ -1,0 +1,27 @@
+{
+    "storage-driver": "overlay2",
+    "log-driver": "journald",
+    "experimental": true,
+    "ip6tables": true,
+    "log-opts": {
+        "tag": "{{.Name}}"
+    },
+    "data-root": "/mnt/data/docker",
+    "deprecated-key-path": "/mnt/overlay/etc/docker/key.json",
+    "bip": "172.30.232.1/23",
+    "registry-mirrors": [
+        "https://docker.1panel.live",
+        "https://docker.1ms.run",
+        "https://dytt.online",
+        "https://docker-0.unsee.tech",
+        "https://lispy.org",
+        "https://docker.xiaogenban1993.com",
+        "https://666860.xyz",
+        "https://hub.rat.dev",
+        "https://docker.m.daocloud.io",
+        "https://demo.52013120.xyz",
+        "https://proxy.vvvv.ee",
+        "https://registry.cyou"
+        
+      ]
+}

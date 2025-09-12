@@ -1,0 +1,142 @@
+name: HAOS-CN
+on:
+  workflow_dispatch:
+    inputs:
+      targets:
+        description: 'Targets to build (comma separated)'
+        required: false
+        default: 'rpi3_64,rpi4_64,rpi5_64,ova,generic_x86_64,generic_aarch64,green,yellow,panther_x2,ihost,orangepi_cm4'
+
+  schedule:
+    - cron: '0 18 26 * *'
+#  watch:
+#    types: [started]
+
+env:
+  RUN_VALIDATION: true
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - id: set-matrix
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            TARGETS="${{ github.event.inputs.targets }}"
+          else
+            TARGETS="rpi3_64,rpi4_64,rpi5_64,ova,generic_x86_64,generic_aarch64,green,yellow,panther_x2,ihost,orangepi_cm4"
+          fi
+          JSON=$(echo "$TARGETS" | jq -R -c 'split(",")')
+          echo "matrix=$JSON" >> $GITHUB_OUTPUT
+
+  build:
+    needs: prepare
+    runs-on: ubuntu-latest
+    name: Build ${{ matrix.target }}
+    strategy:
+      fail-fast: false
+      matrix:
+        target: ${{ fromJson(needs.prepare.outputs.matrix) }}
+    steps:
+      - name: Echo target
+        run: echo "Building for ${{ matrix.target }}"
+        #target: [generic_aarch64,generic_x86_64]
+
+    #steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+      - name: Checkout private repo
+        uses: actions/checkout@v4
+        with:
+          repository: desmond-dong/haos-cn-scripts
+          token: ${{ secrets.GH_PAT }}
+          path: private
+        
+      - name: Get HAOS-CN version
+        id: get_haos_version
+        run: |
+          ver=$(curl -s https://api.github.com/repos/home-assistant/operating-system/releases/latest | jq -r '.tag_name')
+          echo "HASSOS_VERSION=${ver}" >> $GITHUB_ENV
+        
+      - name: Initialization environment and Free up disk space
+        run: |
+          sudo timedatectl set-timezone "Asia/Shanghai"
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /var/lib/apt/lists/*
+          sudo rm -rf /var/cache/apt/archives/*
+          sudo rm -rf /var/cache/debconf/*-old
+          sudo rm -rf /opt/hostedtoolcache/CodeQL
+          sudo apt clean
+          sudo rm -rf /etc/apt/sources.list.d/*
+          sudo apt-get -qq update -y
+          sudo apt-get -qq autoremove --purge -y
+          sudo apt-get -qq clean -y
+          sudo rm -rf "/usr/local/share/boost"
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+          #sudo rm -rf /usr/share/
+          df -h
+      - name: Clone source code and Change Settings.
+        run: |
+          git clone https://github.com/home-assistant/operating-system.git -b main
+          cp -r buildroot-external operating-system
+          cd operating-system
+          git submodule update --init
+
+      - name: Run private build script
+        run: |
+          chmod +x private/*.sh
+          private/haos.sh
+        env:
+          MATRIX_TARGET: ${{matrix.target}}
+          RAUC_CERTIFICATE: ${{ secrets.RAUC_CERTIFICATE }}
+          RAUC_PRIVATE_KEY: ${{ secrets.RAUC_PRIVATE_KEY }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+    
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build 
+        shell: 'script -q -e -c "bash {0}"'
+        id: build
+        run: |
+          sleep $((RANDOM % 600))    
+          cd operating-system
+          max_retries=3
+          count=0
+          until scripts/enter.sh make -j$(($(nproc) + 1)) ${{matrix.target}}; do
+            count=$((count + 1))
+            if [ $count -ge $max_retries ]; then
+              echo "Build failed after $count attempts."
+              exit 1
+            fi
+            echo "Build failed. Retrying in 30s... (Attempt $count/$max_retries)"
+            sleep 30
+          done
+          
+      - name: Get current date
+        id: current_date
+        run: |
+          current_date=$(date +'%Y-%m-%d')
+          echo "CURRENT_DATE=${current_date}" >> $GITHUB_ENV
+      
+      - name: Use current date
+        run: echo "Current date is $CURRENT_DATE"
+
+      - name: Upload images to release
+        id: upload-release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.UPLOAD_TOKEN }}
+          file: operating-system/output/images/haos_*
+          tag: ${{ env.HASSOS_VERSION }}
+          overwrite: true
+          file_glob: true
+          body: "为中国地区专门加速的Home Assistant OS，不修改任何系统内的其它任何信息，所有的修改都以加速为目的。公众号：老王杂谈说，欢迎关注"
