@@ -1,0 +1,35 @@
+From c3f803f835db301e586127b061bd473fb61ec13a Mon Sep 17 00:00:00 2001
+From: Stefan Agner <stefan@agner.ch>
+Date: Wed, 19 Jul 2023 10:08:06 +0200
+Subject: [PATCH] Input: rk805-pwrkey: reverse polarity of pwrkey
+
+The power key is low active. Reverse logic to avoid involuntary long
+press being reported to user space.
+
+Signed-off-by: Stefan Agner <stefan@agner.ch>
+---
+ drivers/input/misc/rk805-pwrkey.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/input/misc/rk805-pwrkey.c b/drivers/input/misc/rk805-pwrkey.c
+index 76873aa005b41..139419033c84a 100644
+--- a/drivers/input/misc/rk805-pwrkey.c
++++ b/drivers/input/misc/rk805-pwrkey.c
+@@ -19,7 +19,7 @@ static irqreturn_t pwrkey_fall_irq(int irq, void *_pwr)
+ {
+ 	struct input_dev *pwr = _pwr;
+ 
+-	input_report_key(pwr, KEY_POWER, 1);
++	input_report_key(pwr, KEY_POWER, 0);
+ 	input_sync(pwr);
+ 
+ 	return IRQ_HANDLED;
+@@ -29,7 +29,7 @@ static irqreturn_t pwrkey_rise_irq(int irq, void *_pwr)
+ {
+ 	struct input_dev *pwr = _pwr;
+ 
+-	input_report_key(pwr, KEY_POWER, 0);
++	input_report_key(pwr, KEY_POWER, 1);
+ 	input_sync(pwr);
+ 
+ 	return IRQ_HANDLED;

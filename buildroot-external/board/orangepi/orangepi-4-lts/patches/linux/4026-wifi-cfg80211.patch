@@ -1,0 +1,107 @@
+diff --git a/drivers/net/wireless/uwe5622/unisocwifi/cfg80211.c b/drivers/net/wireless/uwe5622/unisocwifi/cfg80211.c
+index a90bc0a53e..f7b2a422dc 100755
+--- a/drivers/net/wireless/uwe5622/unisocwifi/cfg80211.c
++++ b/drivers/net/wireless/uwe5622/unisocwifi/cfg80211.c
+@@ -703,7 +703,7 @@ static int sprdwl_add_cipher_key(struct sprdwl_vif *vif, bool pairwise,
+ }
+ 
+ static int sprdwl_cfg80211_add_key(struct wiphy *wiphy, struct net_device *ndev,
+-				   u8 key_index, bool pairwise,
++				   int link_id, u8 key_index, bool pairwise,
+ 				   const u8 *mac_addr,
+ 				   struct key_params *params)
+ {
+@@ -725,7 +725,7 @@ static int sprdwl_cfg80211_add_key(struct wiphy *wiphy, struct net_device *ndev,
+ }
+ 
+ static int sprdwl_cfg80211_del_key(struct wiphy *wiphy, struct net_device *ndev,
+-				   u8 key_index, bool pairwise,
++				   int link_id, u8 key_index, bool pairwise,
+ 				   const u8 *mac_addr)
+ {
+ 	struct sprdwl_vif *vif = netdev_priv(ndev);
+@@ -755,7 +755,7 @@ static int sprdwl_cfg80211_del_key(struct wiphy *wiphy, struct net_device *ndev,
+ 
+ static int sprdwl_cfg80211_set_default_key(struct wiphy *wiphy,
+ 					   struct net_device *ndev,
+-					   u8 key_index, bool unicast,
++					   int link_id, u8 key_index, bool unicast,
+ 					   bool multicast)
+ {
+ 	struct sprdwl_vif *vif = netdev_priv(ndev);
+@@ -984,7 +984,11 @@ static int sprdwl_cfg80211_change_beacon(struct wiphy *wiphy,
+ 	return sprdwl_change_beacon(vif, beacon);
+ }
+ 
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,19, 2))
+ static int sprdwl_cfg80211_stop_ap(struct wiphy *wiphy, struct net_device *ndev, unsigned int link_id)
++#else
++static int sprdwl_cfg80211_stop_ap(struct wiphy *wiphy, struct net_device *ndev)
++#endif
+ {
+ #ifdef DFS_MASTER
+ 	struct sprdwl_vif *vif = netdev_priv(ndev);
+@@ -1721,6 +1725,20 @@ static int sprdwl_cfg80211_sched_scan_stop(struct wiphy *wiphy,
+ #ifdef SYNC_DISCONNECT
+ void sprdwl_disconnect_handle(struct sprdwl_vif *vif)
+ {
++	u16 reason_code = 0;
++	if ((vif->sm_state == SPRDWL_CONNECTED) ||
++			(vif->sm_state == SPRDWL_DISCONNECTING)) {
++		cfg80211_disconnected(vif->ndev, reason_code,
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 4, 83)
++			NULL, 0, true, GFP_KERNEL);
++#else
++			NULL, 0, GFP_KERNEL);
++#endif
++		wl_ndev_log(L_DBG, vif->ndev,
++			"%s %s, reason_code %d\n", __func__,
++			vif->ssid, reason_code);
++	}
++
+ 	vif->sm_state = SPRDWL_DISCONNECTED;
+ 
+ 	/* Clear bssid & ssid */
+@@ -1747,6 +1765,10 @@ static int sprdwl_cfg80211_disconnect(struct wiphy *wiphy,
+ 	struct sprdwl_vif *vif = netdev_priv(ndev);
+ 	enum sm_state old_state = vif->sm_state;
+ 	int ret;
++#ifdef SYNC_DISCONNECT
++	u32 msec;
++	ktime_t kt;
++#endif
+ #ifdef STA_SOFTAP_SCC_MODE
+ 	struct sprdwl_intf *intf = (struct sprdwl_intf *)vif->priv->hw_priv;
+ 	intf->sta_home_channel = 0;
+@@ -1766,17 +1788,19 @@ static int sprdwl_cfg80211_disconnect(struct wiphy *wiphy,
+ 		goto out;
+ 	}
+ #ifdef SYNC_DISCONNECT
+-#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 9, 60)
+ 	if (!sprdwl_sync_disconnect_event(vif, msecs_to_jiffies(1000))) {
+ 		kt = ktime_get();
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 10, 0)
++		msec = (u32)(div_u64(kt, NSEC_PER_MSEC));
++#else
+ 		msec = (u32)(div_u64(kt.tv64, NSEC_PER_MSEC));
++#endif
+ 		wl_err("Wait disconnect event timeout. [mstime = %d]\n",
+-		       cpu_to_le32(msec));
++			   cpu_to_le32(msec));
+ 	} else {
+ 		sprdwl_disconnect_handle(vif);
+ 	}
+ 	atomic_set(&vif->sync_disconnect_event, 0);
+-#endif
+ #endif
+ 	trace_deauth_reason(vif->mode, reason_code, LOCAL_EVENT);
+ out:
+@@ -3103,7 +3127,7 @@ static int sprdwl_cfg80211_set_mac_acl(struct wiphy *wiphy,
+ 	unsigned char *mac_addr = NULL;
+ 
+ 	if (!acl || !acl->n_acl_entries) {
+-		wl_ndev_log(L_ERR, ndev, "%s no ACL data\n", __func__);
++		//wl_ndev_log(L_ERR, ndev, "%s no ACL data\n", __func__);
+ 		return 0;
+ 	}
+ 

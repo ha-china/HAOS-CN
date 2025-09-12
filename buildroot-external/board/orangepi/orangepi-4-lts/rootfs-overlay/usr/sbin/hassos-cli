@@ -1,0 +1,25 @@
+#!/bin/sh
+# ==============================================================================
+# Run logging cli
+# ==============================================================================
+
+echo "Waiting for the Home Assistant CLI to be ready..."
+
+i=0
+while [ ! "$(docker ps -q -f name=hassio_cli)" ]; do
+    sleep 1
+    i=$((i+1))
+    if [ $i = 60 ]; then
+        echo "[WARN] Home Assistant CLI not starting! Jump into emergency console..."
+        exec /bin/ash -l
+    fi
+done
+
+docker container exec \
+    -ti hassio_cli \
+    /usr/bin/cli.sh
+
+# Jump to root login shell
+if [ $? -eq 10 ]; then
+    exec /bin/ash -l
+fi

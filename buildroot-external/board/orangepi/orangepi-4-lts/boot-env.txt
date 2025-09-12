@@ -1,0 +1,1 @@
+fdtfile=rk3399-orangepi-4-lts.dtb

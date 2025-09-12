@@ -1,0 +1,24 @@
+#!/bin/sh
+set -e
+
+swapfile="/mnt/data/swapfile"
+# Swap space in 4k blocks
+swapsize="$(awk '/MemTotal/{ print int($2 * 0.33 / 4) }' /proc/meminfo)"
+
+
+if [ ! -s "${swapfile}" ] || [ "$(stat "${swapfile}" -c '%s')" -lt $((swapsize * 4096)) ]; then
+	# Check free space (in 4k blocks)
+	if [ "$(stat -f /mnt/data -c '%f')" -lt "${swapsize}" ]; then
+		echo "[WARNING] Not enough space to allocate swapfile"
+		exit 1
+	fi
+
+	echo "[INFO] Creating swapfile of size $((swapsize *4))k"
+	umask 0077
+	dd if=/dev/zero of="${swapfile}" bs=4k count="${swapsize}"
+fi
+
+if ! swaplabel "${swapfile}" > /dev/null 2>&1; then
+	/usr/lib/systemd/systemd-makefs swap "${swapfile}"
+fi
+
