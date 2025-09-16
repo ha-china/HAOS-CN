@@ -126,7 +126,8 @@ jobs:
         with:
           repo_token: ${{ secrets.UPLOAD_TOKEN }}
           file: operating-system/output/images/haos_*
-          tag: ${{ env.CURRENT_VERSION }}
+          tag: "dev-${{ env.CURRENT_VERSION }}"
           overwrite: true
           file_glob: true
+          draft: true 
           body: "此为开发版，请不要当正式版使用"
