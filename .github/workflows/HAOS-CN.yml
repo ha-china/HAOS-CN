@@ -129,5 +129,6 @@ jobs:
           tag: "dev-${{ env.CURRENT_VERSION }}"
           overwrite: true
           file_glob: true
-          draft: true 
+          #draft: true 
+          prerelease: true
           body: "此为开发版，请不要当正式版使用"
