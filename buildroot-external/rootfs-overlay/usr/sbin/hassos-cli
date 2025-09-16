@@ -3,8 +3,8 @@
 # Run logging cli
 # ==============================================================================
 
-echo -e "\033[33mWaiting for the Home Assistant CLI to be ready...\033[0m"
-echo -e "\033[31mThis is an open source version, commercial use without permission is prohibited\033[0m"
+echo -e "Waiting for the Home Assistant CLI to be ready..."
+echo -e "唯一官方网站: \033[32mhttps://www.hasscn.top\033[0m"
 echo -e "Official Website: \033[32mhttps://www.hasscn.top\033[0m"
 
 i=0
