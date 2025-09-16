@@ -67,8 +67,7 @@ jobs:
           chmod +x private/*.sh
           sudo private/release_space.sh
           sudo rm -rf "$AGENT_TOOLSDIRECTORY"
-        env:
-          ${{AGENT_TOOLSDIRECTORY}}: ${{ secrets.AGENT_TOOLSDIRECTORY }}
+
       - name: Clone source code and Change Settings.
         run: |
           git clone https://github.com/home-assistant/operating-system.git
