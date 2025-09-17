@@ -4,7 +4,7 @@
 # ==============================================================================
 
 echo -e "Waiting for the Home Assistant CLI to be ready..."
-echo -e "唯一官方网站: \033[32mhttps://www.hasscn.top\033[0m"
+echo -e "OTA service kindly sponsored by Coolkit: \033[32mhttps://www.coolkit.cn/\033[0m"
 echo -e "Official Website: \033[32mhttps://www.hasscn.top\033[0m"
 
 i=0
