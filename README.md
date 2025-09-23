@@ -15,7 +15,7 @@
 ---
 
 ##  ![Home Assistant OS 极速版](https://img.shields.io/badge/Home%20Assistant%20OS-%E6%9E%81%E9%80%9F%E7%89%88-41BDF5?style=for-the-badge&logo=home-assistant&logoColor=white) ![Home Assistant OS China](https://img.shields.io/badge/Home%20Assistant%20OS-China-41BDF5?style=for-the-badge&logo=home-assistant&logoColor=white) ![Home Assistant OS Turbo](https://img.shields.io/badge/Home%20Assistant%20OS-Turbo-41BDF5?style=for-the-badge&logo=home-assistant&logoColor=white)
-### [`Changelog`](https://www.hasscn.top/Changelog.html)
+### [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/ha-china/HAOS-CN) [`Changelog`](https://www.hasscn.top/Changelog.html)
 
 [English](README_EN.md) **中文**
 
@@ -36,7 +36,7 @@
 ### ⚙️ 系统配置优化
 - 🕰️ 默认时区设置为 `Asia/Shanghai`
 - 📅 系统更新频率调整为`每月28日`定期更新
-- 📢 终端页面添加`商业使用限制`声明
+- 📢 终端页面添加`服务器赞助信息`声明
 
 ---
 
@@ -58,7 +58,7 @@
 > 🚀 *专为中国用户优化加速的 Home Assistant OS*
 
 - 🔧 保持系统原生体验，所有更改仅为提速优化以及合规性。
-- 🛡️ **严禁未经授权及超过10台客户端的企业商用！**
+- 🛡️ **所有个人或者商家均可免费使用此产品（愿意赞助的朋友可以扫下面二维码）**
 - 🛠️ 每月**27日**由 **GitHub Actions** 自动构建最新版。
 - ⭐ 如果觉得有帮助，欢迎点个 Star 支持！
 
