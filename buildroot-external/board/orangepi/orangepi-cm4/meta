@@ -1,5 +1,5 @@
 BOARD_ID=orangepi-cm4
-BOARD_NAME="HA OrangePi CM4"
+BOARD_NAME="OrangePi CM4"
 CHASSIS=embedded
 BOOTLOADER=uboot
 KERNEL_FILE=Image
