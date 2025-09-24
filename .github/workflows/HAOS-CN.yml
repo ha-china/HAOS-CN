@@ -47,8 +47,10 @@ jobs:
     #steps:
       - name: Checkout
         uses: actions/checkout@v5
+        with:
+          ref: dev
       - name: Checkout private repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: desmond-dong/haos-cn-scripts
           token: ${{ secrets.GH_PAT }}
