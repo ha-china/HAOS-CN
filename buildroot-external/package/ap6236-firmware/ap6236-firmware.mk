@@ -1,10 +1,9 @@
+AP6236_FIRMWARE_VERSION = 1.0.0
+AP6236_FIRMWARE_LICENSE = Redistributable
+AP6236_FIRMWARE_LICENSE_FILES = LICENSE
+AP6236_FIRMWARE_SITE = $(call github,ophub,firmware,"7aa9141ff97a01a2eff1a16f7d6bc4bb71f7d08d")
 
-FIRMWARE_AP6236_VERSION = 1.0.0
-FIRMWARE_AP6236_LICENSE = Redistributable
-FIRMWARE_AP6236_LICENSE_FILES = LICENSE
-FIRMWARE_AP6236_SITE = $(call github,ophub,firmware,"7aa9141ff97a01a2eff1a16f7d6bc4bb71f7d08d")
-
-define FIRMWARE_AP6236_INSTALL_TARGET_CMDS
+define AP6236_FIRMWARE_INSTALL_TARGET_CMDS
 	$(INSTALL) -D -m 644 $(@D)/firmware/brcm/brcmfmac43430-sdio.txt \
 		$(TARGET_DIR)/usr/lib/firmware/brcm/brcmfmac43430-sdio.txt
 	$(INSTALL) -D -m 644 $(@D)/firmware/brcm/brcmfmac43430-sdio.bin \
