@@ -24,37 +24,62 @@ jobs:
 
       - name: Mirror images to GHCR
         env:
-          DEST_NAMESPACE: "ghcr.io/ha-china"
+          DEST_NAMESPACE: "ghcr.io/ha-hcina"
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -e
 
-          # 遍历 stable.json 所有字符串镜像，过滤 supervisor
-          jq -r '.. | strings | select(test("^ghcr\\.io/home-assistant/(?!supervisor)"))' stable.json | \
-          while read -r src_image; do
-              echo ">>> Processing $src_image"
+          # 遍历 stable.json 的架构字段
+          jq -r 'to_entries[] | select(.key != "supervisor") | .key as $arch | .value | to_entries[] | .key as $image_name | .value as $version | "\($arch) \($image_name) \($version)"' stable.json | \
+          while read -r arch image_name version; do
 
-              src="docker://${src_image}"
+              # core 镜像需要遍历 machine
+              if [[ "$image_name" == "core" ]]; then
+                  jq -r '.homeassistant | to_entries[] | "\(.key) \(.value)"' stable.json | while read -r machine core_version; do
+                      src_image="ghcr.io/home-assistant/${machine}-homeassistant:${core_version}"
+                      echo ">>> Processing core: $src_image"
 
-              # 生成目标路径
-              img_name=$(echo "$src_image" | sed 's|^ghcr.io/home-assistant/||')
-              dest="${DEST_NAMESPACE}/${img_name}"
-              dest="docker://${dest}"
+                      dest="docker://${DEST_NAMESPACE}/${machine}-homeassistant:${core_version}"
 
-              # 获取源 digest
-              src_digest=$(skopeo inspect "$src" | jq -r '.Digest')
+                      # 获取源 digest
+                      src_digest=$(skopeo inspect "docker://${src_image}" | jq -r '.Digest')
 
-              # 获取目标 digest，如果不存在则为空
-              dest_digest=$(skopeo inspect --creds "${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}" "$dest" 2>/dev/null | jq -r '.Digest' || true)
+                      # 获取目标 digest
+                      dest_digest=$(skopeo inspect --creds "${GITHUB_ACTOR}:${GITHUB_TOKEN}" "$dest" 2>/dev/null | jq -r '.Digest' || true)
 
-              if [ "$src_digest" != "$dest_digest" ]; then
-                  echo ">>> Mirror update: $src -> $dest"
-                  skopeo copy --all --dest-creds "${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}" "$src" "$dest"
+                      if [ "$src_digest" != "$dest_digest" ]; then
+                          echo ">>> Mirror update: $src_image -> $dest"
+                          skopeo copy --all --dest-creds "${GITHUB_ACTOR}:${GITHUB_TOKEN}" "docker://${src_image}" "$dest"
 
-                  # 验证目标镜像
-                  echo ">>> Verifying $dest"
-                  skopeo inspect --creds "${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}" "$dest"
+                          # 验证目标镜像
+                          skopeo inspect --creds "${GITHUB_ACTOR}:${GITHUB_TOKEN}" "$dest"
+                      else
+                          echo ">>> No update needed for $src_image"
+                      fi
+                  done
               else
-                  echo ">>> No update needed for $src_image"
+                  # 非 core 镜像直接替换 arch
+                  src_image="ghcr.io/home-assistant/${arch}-${image_name}:${version}"
+                  echo ">>> Processing $src_image"
+
+                  dest="docker://${DEST_NAMESPACE}/${arch}-${image_name}:${version}"
+
+                  # 获取源 digest
+                  src_digest=$(skopeo inspect "docker://${src_image}" | jq -r '.Digest')
+
+                  # 获取目标 digest
+                  dest_digest=$(skopeo inspect --creds "${GITHUB_ACTOR}:${GITHUB_TOKEN}" "$dest" 2>/dev/null | jq -r '.Digest' || true)
+
+                  if [ "$src_digest" != "$dest_digest" ]; then
+                      echo ">>> Mirror update: $src_image -> $dest"
+                      skopeo copy --all --dest-creds "${GITHUB_ACTOR}:${GITHUB_TOKEN}" "docker://${src_image}" "$dest"
+
+                      # 验证目标镜像
+                      skopeo inspect --creds "${GITHUB_ACTOR}:${GITHUB_TOKEN}" "$dest"
+                  else
+                      echo ">>> No update needed for $src_image"
+                  fi
               fi
           done
 
