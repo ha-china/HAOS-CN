@@ -8,11 +8,8 @@ on:
 jobs:
   mirror:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write   
     steps:
-      - name: Install deps
+      - name: Install dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y jq skopeo curl
@@ -20,9 +17,8 @@ jobs:
       - name: Fetch HA stable.json
         run: |
           curl -sSL https://version.home-assistant.io/stable.json -o stable.json
-          cat stable.json
 
-      - name: Mirror images (skip supervisor)
+      - name: Mirror images (skip supervisor) and verify
         env:
           DEST_NAMESPACE: "ghcr.io/${{ github.repository_owner }}"
         run: |
@@ -32,25 +28,32 @@ jobs:
               echo ">>> Skipping supervisor: $image"
               continue
             fi
-            # 有人喜欢偷别人的劳动成果恶心抹除出处占为己有~继续偷~你猜我这个工作流是干嘛用的
 
             echo ">>> Processing $image"
             src="docker://${image}"
+
+            # 改写目标仓库路径
             img_name=$(echo $image | sed 's|^ghcr.io/home-assistant/||')
             dest="${DEST_NAMESPACE}/${img_name}"
             dest="docker://${dest}"
 
+            # 获取源镜像 digest
             src_digest=$(skopeo inspect $src | jq -r '.Digest')
 
+            # 获取目标 digest（不存在时为空）
             dest_digest=$(skopeo inspect --creds "${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}" \
                           $dest 2>/dev/null | jq -r '.Digest' || true)
 
             if [ "$src_digest" != "$dest_digest" ]; then
-              echo "Mirror update: $src -> $dest"
-              skopeo copy --all \
-                --dest-creds "${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}" \
-                $src $dest
+              echo ">>> Mirror update: $src -> $dest"
+              skopeo copy --all --dest-creds "${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}" $src $dest
+              
+              # 验证目标是否存在
+              echo ">>> Verifying $dest"
+              skopeo inspect --creds "${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}" $dest
             else
-              echo "No update needed for $image"
+              echo ">>> No update needed for $image"
             fi
           done
+# 有人喜欢偷别人的劳动成果恶心抹除出处占为己有~继续偷~你猜我这个工作流是干嘛用的
+
