@@ -1,0 +1,56 @@
+name: Mirror Home Assistant images
+
+on:
+  schedule:
+    - cron: "0 3 * * *"   
+  workflow_dispatch: {}
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write   
+    steps:
+      - name: Install deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq skopeo curl
+
+      - name: Fetch HA stable.json
+        run: |
+          curl -sSL https://version.home-assistant.io/stable.json -o stable.json
+          cat stable.json
+
+      - name: Mirror images (skip supervisor)
+        env:
+          DEST_NAMESPACE: "ghcr.io/${{ github.repository_owner }}"
+        run: |
+          set -e
+          for image in $(jq -r '..|objects|select(has("image"))|.image' stable.json); do
+            if [[ "$image" == *"supervisor"* ]]; then
+              echo ">>> Skipping supervisor: $image"
+              continue
+            fi
+            # 有人喜欢偷别人的劳动成果恶心抹除出处占为己有~继续偷~你猜我这个工作流是干嘛用的
+
+            echo ">>> Processing $image"
+            src="docker://${image}"
+            img_name=$(echo $image | sed 's|^ghcr.io/home-assistant/||')
+            dest="${DEST_NAMESPACE}/${img_name}"
+            dest="docker://${dest}"
+
+            src_digest=$(skopeo inspect $src | jq -r '.Digest')
+
+            dest_digest=$(skopeo inspect --creds "${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}" \
+                          $dest 2>/dev/null | jq -r '.Digest' || true)
+
+            if [ "$src_digest" != "$dest_digest" ]; then
+              echo "Mirror update: $src -> $dest"
+              skopeo copy --all \
+                --dest-creds "${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}" \
+                $src $dest
+            else
+              echo "No update needed for $image"
+            fi
+          done
