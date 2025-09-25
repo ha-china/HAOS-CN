@@ -1,9 +1,13 @@
-name: Mirror Home Assistant images
+name: Mirror Home Assistant Images to GHCR
 
 on:
   schedule:
-    - cron: "0 3 * * *"   
-  workflow_dispatch: {}
+    - cron: "0 3 * * *"   # 每天凌晨3点自动同步
+  workflow_dispatch: {}    # 可以手动触发
+
+permissions:
+  contents: read
+  packages: write  # 确保 GITHUB_TOKEN 可以推送 GHCR
 
 jobs:
   mirror:
@@ -14,46 +18,45 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y jq skopeo curl
 
-      - name: Fetch HA stable.json
+      - name: Fetch stable.json
         run: |
           curl -sSL https://version.home-assistant.io/stable.json -o stable.json
 
-      - name: Mirror images (skip supervisor) and verify
+      - name: Mirror images to GHCR
         env:
-          DEST_NAMESPACE: "ghcr.io/${{ github.repository_owner }}"
+          DEST_NAMESPACE: "ghcr.io/ha-china"
         run: |
           set -e
-          for image in $(jq -r '..|objects|select(has("image"))|.image' stable.json); do
-            if [[ "$image" == *"supervisor"* ]]; then
-              echo ">>> Skipping supervisor: $image"
-              continue
-            fi
 
-            echo ">>> Processing $image"
-            src="docker://${image}"
+          # 遍历 stable.json 所有字符串镜像，过滤 supervisor
+          jq -r '.. | strings | select(test("^ghcr\\.io/home-assistant/(?!supervisor)"))' stable.json | \
+          while read -r src_image; do
+              echo ">>> Processing $src_image"
 
-            # 改写目标仓库路径
-            img_name=$(echo $image | sed 's|^ghcr.io/home-assistant/||')
-            dest="${DEST_NAMESPACE}/${img_name}"
-            dest="docker://${dest}"
+              src="docker://${src_image}"
 
-            # 获取源镜像 digest
-            src_digest=$(skopeo inspect $src | jq -r '.Digest')
+              # 生成目标路径
+              img_name=$(echo "$src_image" | sed 's|^ghcr.io/home-assistant/||')
+              dest="${DEST_NAMESPACE}/${img_name}"
+              dest="docker://${dest}"
 
-            # 获取目标 digest（不存在时为空）
-            dest_digest=$(skopeo inspect --creds "${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}" \
-                          $dest 2>/dev/null | jq -r '.Digest' || true)
+              # 获取源 digest
+              src_digest=$(skopeo inspect "$src" | jq -r '.Digest')
 
-            if [ "$src_digest" != "$dest_digest" ]; then
-              echo ">>> Mirror update: $src -> $dest"
-              skopeo copy --all --dest-creds "${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}" $src $dest
-              
-              # 验证目标是否存在
-              echo ">>> Verifying $dest"
-              skopeo inspect --creds "${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}" $dest
-            else
-              echo ">>> No update needed for $image"
-            fi
+              # 获取目标 digest，如果不存在则为空
+              dest_digest=$(skopeo inspect --creds "${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}" "$dest" 2>/dev/null | jq -r '.Digest' || true)
+
+              if [ "$src_digest" != "$dest_digest" ]; then
+                  echo ">>> Mirror update: $src -> $dest"
+                  skopeo copy --all --dest-creds "${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}" "$src" "$dest"
+
+                  # 验证目标镜像
+                  echo ">>> Verifying $dest"
+                  skopeo inspect --creds "${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}" "$dest"
+              else
+                  echo ">>> No update needed for $src_image"
+              fi
           done
+
 # 有人喜欢偷别人的劳动成果恶心抹除出处占为己有~继续偷~你猜我这个工作流是干嘛用的
 
