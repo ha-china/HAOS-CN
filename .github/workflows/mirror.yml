@@ -24,13 +24,13 @@ jobs:
 
       - name: Mirror images to GHCR
         env:
-          DEST_NAMESPACE: "ghcr.io/ha-hcina"
+          DEST_NAMESPACE: "ghcr.io/ha-china"
           GITHUB_ACTOR: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -e
 
-          DEST_NAMESPACE="ghcr.io/ha-hcina"
+          DEST_NAMESPACE="ghcr.io/ha-china"
           ARCH_LIST=("armhf" "armv7" "aarch64" "amd64" "i386")
 
           # -----------------------------
