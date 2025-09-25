@@ -1,8 +1,8 @@
 name: Mirror Home Assistant Images to GHCR
 
 on:
-  schedule:
-    - cron: "0 3 * * *"   # 每天凌晨3点自动同步
+#  schedule:
+#    - cron: "0 3 * * *"   # 每天凌晨3点自动同步
   workflow_dispatch: {}    # 可以手动触发
 
 permissions:
