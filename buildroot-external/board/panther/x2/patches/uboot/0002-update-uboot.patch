@@ -1,0 +1,34 @@
+diff --git a/arch/arm/dts/rk3566-panther-x2-u-boot.dtsi b/arch/arm/dts/rk3566-panther-x2-u-boot.dtsi
+--- a/arch/arm/dts/rk3566-panther-x2-u-boot.dtsi
++++ b/arch/arm/dts/rk3566-panther-x2-u-boot.dtsi
+@@ -9,7 +9,7 @@
+ / {
+ 	chosen {
+ 		stdout-path = &uart2;
+-		u-boot,spl-boot-order = &sdmmc0, &sdhci, &spiflash;
++		u-boot,spl-boot-order = &sdmmc0, &sdhci;
+ 	};
+ };
+ 
+@@ -78,20 +78,7 @@
+ };
+ 
+ &sfc {
+-	bootph-all;
+-	u-boot,spl-sfc-no-dma;
+-	#address-cells = <1>;
+-	#size-cells = <0>;
+-	status = "okay";
+-
+-	spiflash: flash@0 {
+-		bootph-all;
+-		compatible = "jedec,spi-nor";
+-		reg = <0>;
+-		spi-max-frequency = <24000000>;
+-		spi-rx-bus-width = <1>;
+-		spi-tx-bus-width = <1>;
+-	};
++	status = "disabled";
+ };
+ 
+ &sdmmc2 {

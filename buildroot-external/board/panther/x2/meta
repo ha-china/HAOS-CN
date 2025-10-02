@@ -1,5 +1,9 @@
 BOARD_ID=panther-x2
+<<<<<<< HEAD
 BOARD_NAME="Panther X2"
+=======
+BOARD_NAME="Home Assistant Panther X2"
+>>>>>>> main
 CHASSIS=embedded
 BOOTLOADER=uboot
 KERNEL_FILE=Image
