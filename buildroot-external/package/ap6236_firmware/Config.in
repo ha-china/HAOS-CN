@@ -1,4 +1,4 @@
-config BR2_PACKAGE_FIRMWARE_AP6236
+config BR2_PACKAGE_AP6236_FIRMWARE
 	bool "Firmware for AMPAK AP6236"
 	help
 	  At least some AP6236 seem to be BCM43436B0, not BCM43430.
