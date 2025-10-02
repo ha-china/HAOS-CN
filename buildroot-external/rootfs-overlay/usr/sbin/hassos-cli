@@ -3,7 +3,6 @@
 # Run logging cli
 # ==============================================================================
 
-echo -e "Waiting for the Home Assistant CLI to be ready..."
 echo -e "OTA service kindly sponsored by Coolkit: \033[32mhttps://www.coolkit.cn/\033[0m"
 echo -e "Official Website: \033[32mhttps://www.hasscn.top\033[0m"
 
