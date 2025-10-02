@@ -55,9 +55,17 @@ jobs:
           repository: desmond-dong/haos-cn-scripts
           token: ${{ secrets.GH_PAT }}
           path: private
-        
-      - name: Get HAOS-CN version
+
+      - name: Run only on main
+        if: github.ref_name == 'main'
         id: get_haos_version
+        run: |
+          ver=$(curl -s https://api.github.com/repos/home-assistant/operating-system/releases/latest | jq -r '.tag_name')
+          echo "HASSOS_VERSION=${ver}" >> $GITHUB_ENV
+  
+      - name: Run only on dev
+        if: github.ref_name == 'dev'
+        id: get_haos_version_dev
         run: |
           ver=$(curl -s https://version.home-assistant.io/dev.json | jq -r '.hassos.ova')
           echo "CURRENT_VERSION=${ver}"
