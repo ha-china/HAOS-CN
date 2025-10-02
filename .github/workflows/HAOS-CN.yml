@@ -47,8 +47,7 @@ jobs:
     #steps:
       - name: Checkout
         uses: actions/checkout@v5
-        with:
-          ref: dev
+
       - name: Checkout private repo
         uses: actions/checkout@v5
         with:
