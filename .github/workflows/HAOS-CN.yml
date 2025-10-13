@@ -107,7 +107,7 @@ jobs:
         id: build_haos_builder
         with:
           context: .
-          file: Dockerfile
+          file: operating-system/Dockerfile
           tags: ghcr.io/ha-china/haos-builder
           #cache-from: ghcr.io/${{ github.repository_owner }}/haos-builder:cache-${{ steps.version.outputs.version_main }}
           #cache-to: ghcr.io/${{ github.repository_owner }}/haos-builder:cache-${{ steps.version.outputs.version_main }}
