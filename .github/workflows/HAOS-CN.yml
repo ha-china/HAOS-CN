@@ -111,7 +111,7 @@ jobs:
           cd operating-system
           max_retries=3
           count=0
-          until scripts/enter.sh make -j$(($(nproc) + 1)) ${{matrix.target}}; do
+          until scripts/entry.sh make -j$(($(nproc) + 1)) ${{matrix.target}}; do
             count=$((count + 1))
             if [ $count -ge $max_retries ]; then
               echo "Build failed after $count attempts."
