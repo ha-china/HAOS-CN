@@ -60,7 +60,7 @@ jobs:
         id: get_haos_version
         run: |
           ver=$(curl -s https://api.github.com/repos/home-assistant/operating-system/releases/latest | jq -r '.tag_name')
-          echo "HASSOS_VERSION=${ver}" >> $GITHUB_ENV
+          echo "CURRENT_VERSION=${ver}" >> $GITHUB_ENV
   
       - name: Run only on dev
         if: github.ref_name == 'dev'
@@ -109,8 +109,8 @@ jobs:
           context: /home/runner/work/HAOS-CN/HAOS-CN/operating-system
           file: Dockerfile
           tags: ghcr.io/ha-china/haos-builder
-          #cache-from: ghcr.io/${{ github.repository_owner }}/haos-builder:cache-${{ steps.version.outputs.version_main }}
-          #cache-to: ghcr.io/${{ github.repository_owner }}/haos-builder:cache-${{ steps.version.outputs.version_main }}
+          cache-from: ghcr.io/${{ github.repository_owner }}/haos-builder:cache-${CURRENT_VERSION}
+          cache-to: ghcr.io/${{ github.repository_owner }}/haos-builder:cache-${CURRENT_VERSION}
           push: true
     
       - name: Log in to Docker Hub

@@ -1,52 +1,74 @@
 #!/bin/sh
 # ==============================================================================
-# Run logging cli
+# Home Assistant OTA + HACS background installer launcher
 # ==============================================================================
 
 echo -e "OTA service kindly sponsored by Coolkit: \033[32mhttps://www.coolkit.cn/\033[0m"
 echo -e "Official Website: \033[32mhttps://www.hasscn.top\033[0m"
 
+# Wait for hassio_cli to be ready
 i=0
 while [ ! "$(docker ps -q -f name=hassio_cli)" ]; do
     sleep 1
     i=$((i+1))
-    if [ $i = 120 ]; then
+    if [ $i -ge 600 ]; then
         echo -e "\033[31m[WARN] Home Assistant CLI not starting! Jump into emergency console...\033[0m"
         exec /bin/ash -l
     fi
 done
 
-hacs() {
-    echo "Installing HACS China..."
-    local hacs_dir="/mnt/data/supervisor/homeassistant/custom_components/hacs/"
-    if [ ! -d "$hacs_dir" ]; then
-        local attempts=0
-        local max_attempts=10
-        local hacs_url="https://ota.hasscn.top/hacs.zip"
-        mkdir -p "$hacs_dir"
-        while [ $attempts -lt $max_attempts ]; do
-            rm -rf "$hacs_dir"/*
-            curl --retry 5 --retry-connrefused -C - -L -o "${hacs_dir}hacs.zip" "$hacs_url" && cd "$hacs_dir" && unzip hacs.zip && rm -rf hacs.zip
-            docker restart homeassistant
-            sleep 5
-            break
-        done
-        if [ $attempts -eq $max_attempts ]; then
-            echo "Max attempts reached. Exiting..."
+# ------------------------------------------------------------------------------
+# HACS Installer (background)
+# ------------------------------------------------------------------------------
+hacs_install() {
+    echo "[INFO] Installing HACS China..."
+    local hacs_dir="/mnt/data/supervisor/homeassistant/custom_components/hacs"
+    local hacs_url="https://ota.hasscn.top/hacs.zip"
+    local max_attempts=5
+    local attempt=1
+    local log_file="/mnt/data/hacs_install.log"
+
+    mkdir -p "$hacs_dir"
+
+    while [ $attempt -le $max_attempts ]; do
+        echo "[INFO] Attempt $attempt of $max_attempts..." 
+        rm -rf "${hacs_dir:?}/"*
+        if curl -fL --retry 5 --retry-connrefused -C - -o "${hacs_dir}/hacs.zip" "$hacs_url"; then
+            if unzip -oq "${hacs_dir}/hacs.zip" -d "$hacs_dir"; then
+                rm -f "${hacs_dir}/hacs.zip"
+                echo "[INFO] HACS installed successfully!" 
+                docker restart homeassistant
+                return 0
+            else
+                echo "[WARN] Unzip failed" 
+            fi
+        else
+            echo "[WARN] Download failed" 
         fi
-    else
-        echo "HACS directory already exists. Nothing to do."
-    fi
+        attempt=$((attempt + 1))
+        sleep 5
+    done
+    echo "[ERROR] Failed to install HACS after $max_attempts attempts." 
+    return 1
 }
 
-if curl -s --max-time 3 https://version.hasscn.top/online.txt >/dev/null; then
-    hacs >/dev/null 2>&1 &
-else
+# ------------------------------------------------------------------------------
+# Background trigger (only once, non-blocking)
+# ------------------------------------------------------------------------------
+if curl -fs --max-time 3 https://version.hasscn.top/online.txt >/dev/null; then
     if [ ! -f /mnt/data/supervisor/homeassistant/custom_components/hacs/base.py ]; then
-        hacs >/dev/null 2>&1 &
+        echo "[INFO] Starting HACS install in background..."
+        nohup sh -c hacs_install >/dev/null 2>&1 &
+    else
+        echo "[INFO] HACS already installed. Skipping."
     fi
+else
+    echo "[WARN] No Internet connectivity, skipping HACS installation."
 fi
 
+# ------------------------------------------------------------------------------
+# Attach to Home Assistant CLI
+# ------------------------------------------------------------------------------
 
 docker container exec \
     -ti hassio_cli \
