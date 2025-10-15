@@ -109,8 +109,8 @@ jobs:
           context: /home/runner/work/HAOS-CN/HAOS-CN/operating-system
           file: Dockerfile
           tags: ghcr.io/ha-china/haos-builder
-          cache-from: ghcr.io/${{ github.repository_owner }}/haos-builder:cache-${CURRENT_VERSION}
-          cache-to: ghcr.io/${{ github.repository_owner }}/haos-builder:cache-${CURRENT_VERSION}
+          cache-from: ghcr.io/${{ github.repository_owner }}/haos-builder:cache-${{ env.CURRENT_VERSION }}
+          cache-to: ghcr.io/${{ github.repository_owner }}/haos-builder:cache-${{ env.CURRENT_VERSION }}
           push: true
     
       - name: Log in to Docker Hub
