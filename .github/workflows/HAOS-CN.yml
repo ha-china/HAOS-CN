@@ -30,6 +30,10 @@ jobs:
           fi
           JSON=$(echo "$TARGETS" | jq -R -c 'split(",")')
           echo "matrix=$JSON" >> $GITHUB_OUTPUT
+    permissions:
+      contents: read
+      pull-requests: read
+      packages: write
 
   build:
     needs: prepare
@@ -108,9 +112,9 @@ jobs:
         with:
           context: /home/runner/work/HAOS-CN/HAOS-CN/operating-system
           file: Dockerfile
-          tags: ghcr.io/ha-china/haos-builder
-          cache-from: ghcr.io/${{ github.repository_owner }}/haos-builder:cache-${{ env.CURRENT_VERSION }}
-          cache-to: ghcr.io/${{ github.repository_owner }}/haos-builder:cache-${{ env.CURRENT_VERSION }}
+          tags: ghcr.io/ha-china/haos-builder:latest
+          cache-from: ghcr.io/ha-china/haos-builder:cache-${{ env.CURRENT_VERSION }} || type=registry
+          cache-to: ghcr.io/ha-china/haos-builder:cache-${{ env.CURRENT_VERSION }},mode=max
           push: true
     
       - name: Log in to Docker Hub

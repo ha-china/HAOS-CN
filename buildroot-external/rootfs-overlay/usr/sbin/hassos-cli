@@ -9,6 +9,7 @@ echo -e "Official Website: \033[32mhttps://www.hasscn.top\033[0m"
 # Wait for hassio_cli to be ready
 i=0
 while [ ! "$(docker ps -q -f name=hassio_cli)" ]; do
+    echo -e "\033[33m[WARN] Home Assistant CLI not ready yet! Waiting...\033[0m"
     sleep 1
     i=$((i+1))
     if [ $i -ge 600 ]; then
@@ -26,7 +27,6 @@ hacs_install() {
     local hacs_url="https://ota.hasscn.top/hacs.zip"
     local max_attempts=5
     local attempt=1
-    local log_file="/mnt/data/hacs_install.log"
 
     mkdir -p "$hacs_dir"
 
@@ -40,10 +40,8 @@ hacs_install() {
                 docker restart homeassistant
                 return 0
             else
-                echo "[WARN] Unzip failed" 
             fi
         else
-            echo "[WARN] Download failed" 
         fi
         attempt=$((attempt + 1))
         sleep 5
@@ -60,7 +58,7 @@ if curl -fs --max-time 3 https://version.hasscn.top/online.txt >/dev/null; then
         echo "[INFO] Starting HACS install in background..."
         nohup sh -c hacs_install >/dev/null 2>&1 &
     else
-        echo "[INFO] HACS already installed. Skipping."
+        echo "[INFO] HACS already installed. Please add HACS in the Home Assistant Integration page if not yet added."
     fi
 else
     echo "[WARN] No Internet connectivity, skipping HACS installation."
