@@ -1,8 +1,0 @@
-[Unit]
-Description=HassOS config partition
-
-[Mount]
-What=/dev/disk/by-label/CONFIG
-Where=/mnt/config
-Type=auto
-Options=ro
