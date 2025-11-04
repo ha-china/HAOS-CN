@@ -22,14 +22,14 @@ Due to a recent surge in invalid server traffic (tens of thousands of invalid re
 **This system is an optimized version based on the Home Assistant [official repository](https://github.com/home-assistant/operating-system).**
 
 ### 🚀 Network Acceleration Optimization
-- 🕵️‍♂️ `Version check service` migrated to China Mainland Alibaba BGP node
-- 🛡️ `System network check` migrated to China Mainland Alibaba BGP node
-- ⏰ `Time synchronization server` migrated to China Mainland
+- 🕵️‍♂️ `Version check service` migrated to China Mainland Tencent BGP node
+- 🛡️ `System network check` migrated to China Mainland Tencent BGP node
+- ⏰ `Time synchronization server` migrated to China Mainland public NTP server
 - 🏫 `Image pull service` migrated to China Mainland Tencent BGP node
 - 🔄 `OTA update service` migrated to China Mainland Tencent BGP node
-- ⚡ `System download addresses` optimized to China Mainland high-speed nodes
+- ⚡ `System download addresses` optimized to China Tencent BGP node
 - 🐳 Added China Mainland [`docker.io`](https://github.com/dongyubin/DockerHub) mirror in the system
-- 📨 `Automatic background error report` service migrated to China Mainland server
+- 📨 `Automatic background error report` service migrated to China Mainland Tencent BGP node
 
 ---
 

@@ -1,0 +1,1 @@
+fdtfile=rk3588-rock-5b.dtb
