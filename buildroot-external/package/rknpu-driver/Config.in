@@ -1,0 +1,28 @@
+config BR2_PACKAGE_RKNPU_DRIVER
+	bool "rknpu-driver"
+	depends on BR2_LINUX_KERNEL
+	depends on BR2_aarch64
+	help
+	  RKNPU (Rockchip Neural Processing Unit) kernel driver
+	  for RK3588 series SoCs.
+	  
+	  This driver provides kernel-level support for Rockchip's
+	  NPU hardware acceleration, enabling AI inference capabilities
+	  on RK3588 platforms.
+	  
+	  Supports:
+	  - RK3588 series (including RK3588S)
+	  - Hardware AI acceleration
+	  - RKNN model inference
+	  - Memory management for NPU
+	  
+	  Note: This is the out-of-tree driver from Rockchip.
+	  Main kernel Panfrost driver does not include NPU support.
+	  
+	  https://github.com/airockchip/rknn-llm
+
+comment "rknpu-driver needs a Linux kernel to be built"
+	depends on !BR2_LINUX_KERNEL
+
+comment "rknpu-driver is only available on aarch64"
+	depends on !BR2_aarch64

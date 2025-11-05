@@ -1,0 +1,27 @@
+config BR2_PACKAGE_ROCKCHIP_BLOBS
+	bool "rockchip-blobs"
+	depends on BR2_aarch64
+	depends on BR2_TARGET_UBOOT
+	help
+	  Rockchip proprietary firmware binaries for RK35xx series SoCs.
+	  
+	  This package provides essential bootloader blobs required for
+	  Rockchip RK3588 series SoCs, including:
+	  - ARM Trusted Firmware (ATF/BL31)
+	  - DDR initialization firmware (TPL)
+	  - Trust Execution Environment (TEE) firmware
+	  
+	  These blobs are required for proper boot sequence on RK3588
+	  platforms like ROCK 5B, Orange Pi 5B, etc.
+	  
+	  The package downloads official Rockchip firmware from their
+	  GitHub repository and configures U-Boot to use the appropriate
+	  binaries based on the target platform.
+	  
+	  https://github.com/rockchip-linux/rkbin
+
+comment "rockchip-blobs needs ARM64 architecture"
+	depends on !BR2_aarch64
+
+comment "rockchip-blobs needs U-Boot to be built"
+	depends on !BR2_TARGET_UBOOT

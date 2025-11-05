@@ -11,7 +11,7 @@ function hassos_pre_image() {
     cp "${BOARD_DIR}/cmdline.txt" "${BOOT_DATA}/cmdline.txt"
 }
 
+
 function hassos_post_image() {
     convert_disk_image_xz
 }
-

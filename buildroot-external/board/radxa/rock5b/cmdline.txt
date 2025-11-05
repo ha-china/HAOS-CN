@@ -1,0 +1,4 @@
+verbosity=1
+bootlogo=false
+console=serial
+console=ttyFIQ0,1500000n8 console=tty0

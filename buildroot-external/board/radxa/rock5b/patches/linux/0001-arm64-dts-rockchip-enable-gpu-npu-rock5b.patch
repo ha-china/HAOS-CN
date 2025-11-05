@@ -1,0 +1,42 @@
+From: Assistant <assistant@example.com>
+Date: Sat, 24 Aug 2025 16:40:00 +0800
+Subject: [PATCH] arm64: dts: rockchip: Enable GPU and NPU for ROCK 5B
+
+Enable Mali GPU and RKNPU for Radxa ROCK 5B board.
+This patch ensures proper power supply configuration and
+device enablement for GPU and NPU functionality.
+
+Signed-off-by: Assistant <assistant@example.com>
+---
+ arch/arm64/boot/dts/rockchip/rk3588-rock-5b.dts | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/rockchip/rk3588-rock-5b.dts b/arch/arm64/boot/dts/rockchip/rk3588-rock-5b.dts
+index 123456789abc..def0123456789 100644
+--- a/arch/arm64/boot/dts/rockchip/rk3588-rock-5b.dts
++++ b/arch/arm64/boot/dts/rockchip/rk3588-rock-5b.dts
+@@ -100,6 +100,22 @@
+ 	status = "okay";
+ };
+ 
++&gpu {
++	mali-supply = <&vdd_gpu_s0>;
++	mem-supply = <&vdd_gpu_mem_s0>;
++	status = "okay";
++};
++
++&rknpu {
++	rknpu-supply = <&vdd_npu_s0>;
++	mem-supply = <&vdd_npu_mem_s0>;
++	status = "okay";
++};
++
++&rknpu_mmu {
++	status = "okay";
++};
++
+ &uart2 {
+ 	pinctrl-0 = <&uart2m0_xfer>;
+ 	status = "okay";
+-- 
+2.25.1
