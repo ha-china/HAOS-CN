@@ -83,7 +83,11 @@ jobs:
 
       - name: Clone source code and Change Settings.
         run: |
-          git clone https://github.com/home-assistant/operating-system.git
+          if [ "${GITHUB_REF_NAME}" = "main" ]; then
+            git clone --branch "${CURRENT_VERSION}" https://github.com/home-assistant/operating-system.git
+          else
+            git clone https://github.com/home-assistant/operating-system.git
+          fi
           cp -r buildroot-external operating-system
           cd operating-system
           git submodule update --init

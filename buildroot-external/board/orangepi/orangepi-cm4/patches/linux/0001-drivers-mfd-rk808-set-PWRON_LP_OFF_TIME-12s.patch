@@ -40,5 +40,3 @@ index 69cbea78b430b..4bfeea8bb27ff 100644
  /* INTERRUPT REGISTER */
  #define RK817_INT_STS_REG0		0xf8
  #define RK817_INT_STS_MSK_REG0		0xf9
--- 
-2.43.0
