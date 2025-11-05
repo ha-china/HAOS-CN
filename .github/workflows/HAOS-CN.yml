@@ -138,9 +138,8 @@ jobs:
         with:
           repo_token: ${{ secrets.UPLOAD_TOKEN }}
           file: operating-system/output/images/haos_*
-          tag: "dev-${{ env.CURRENT_VERSION }}"
+          tag: ${{ github.ref == 'refs/heads/main' && env.HASSOS_VERSION || format('dev-{0}', env.CURRENT_VERSION) }}
           overwrite: true
           file_glob: true
-          #draft: true 
-          prerelease: true
-          body: "此为开发版，请不要当正式版使用"
+          body: ${{ github.ref == 'refs/heads/main' && '为中国地区专门加速的Home Assistant OS，不修改任何系统内的其它任何信息，所有的修改都以加速为目的。公众号：老王杂谈说，欢迎关注' || '此为开发版，请不要当正式版使用' }}
+          prerelease: ${{ github.ref != 'refs/heads/main' }}
