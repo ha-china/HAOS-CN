@@ -136,14 +136,26 @@ jobs:
       - name: Use current date
         run: echo "Current date is $CURRENT_DATE"
 
+      - name: Set tag and body for release
+        if: github.ref_name == 'main'
+        run: |
+          echo "RELEASE_TAG=${HASSOS_VERSION}" >> $GITHUB_ENV
+          echo "RELEASE_BODY=为中国地区专门加速的Home Assistant OS，不修改任何系统内的其它任何信息，所有的修改都以加速为目的。公众号：老王杂谈说，欢迎关注" >> $GITHUB_ENV
+
+      - name: Set tag and body for dev release
+        if: github.ref_name != 'main'
+        run: |
+          echo "RELEASE_TAG=dev-${CURRENT_VERSION}" >> $GITHUB_ENV
+          echo "RELEASE_BODY=此为开发版，请不要当正式版使用" >> $GITHUB_ENV
+
       - name: Upload images to release
         id: upload-release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.UPLOAD_TOKEN }}
           file: operating-system/output/images/haos_*
-          tag: ${{ github.ref == 'refs/heads/main' && env.HASSOS_VERSION || format('dev-{0}', env.CURRENT_VERSION) }}
+          tag: ${{ env.RELEASE_TAG }}
           overwrite: true
           file_glob: true
-          body: ${{ github.ref == 'refs/heads/main' && '为中国地区专门加速的Home Assistant OS，不修改任何系统内的其它任何信息，所有的修改都以加速为目的。公众号：老王杂谈说，欢迎关注' || '此为开发版，请不要当正式版使用' }}
+          body: ${{ env.RELEASE_BODY }}
           prerelease: ${{ github.ref != 'refs/heads/main' }}
