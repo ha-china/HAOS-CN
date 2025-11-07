@@ -139,7 +139,7 @@ jobs:
       - name: Set tag and body for release
         if: github.ref_name == 'main'
         run: |
-          echo "RELEASE_TAG=${HASSOS_VERSION}" >> $GITHUB_ENV
+          echo "RELEASE_TAG=${CURRENT_VERSION}" >> $GITHUB_ENV
           echo "RELEASE_BODY=为中国地区专门加速的Home Assistant OS，不修改任何系统内的其它任何信息，所有的修改都以加速为目的。公众号：老王杂谈说，欢迎关注" >> $GITHUB_ENV
 
       - name: Set tag and body for dev release
