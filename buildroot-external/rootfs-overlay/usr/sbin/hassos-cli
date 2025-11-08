@@ -5,7 +5,7 @@
 
 echo -e "OTA service kindly sponsored by Coolkit: \033[32mhttps://www.coolkit.cn/\033[0m"
 echo -e "Official Website: \033[32mhttps://www.hasscn.top\033[0m"
-echo -e " Home Assistant CLI not ready yet! Waiting..."
+echo -e "Home Assistant CLI not ready yet! Waiting..."
 # Wait for hassio_cli to be ready
 i=0
 while [ ! "$(docker ps -q -f name=hassio_cli)" ]; do
