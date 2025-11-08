@@ -115,17 +115,8 @@ jobs:
         run: |
           sleep $((RANDOM % 600))    
           cd operating-system
-          max_retries=3
-          count=0
-          until scripts/enter.sh make -j$(($(nproc) + 1)) ${{matrix.target}}; do
-            count=$((count + 1))
-            if [ $count -ge $max_retries ]; then
-              echo "Build failed after $count attempts."
-              exit 1
-            fi
-            echo "Build failed. Retrying in 30s... (Attempt $count/$max_retries)"
-            sleep 30
-          done
+          scripts/enter.sh make ${{matrix.target}}
+
           
       - name: Get current date
         id: current_date
