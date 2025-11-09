@@ -1,20 +1,4 @@
-From 3f4a1f820acb2b3f5b27b3e28d3dc45a8a07a5e7 Mon Sep 17 00:00:00 2001
-From: Desmond Dong <djhui@live.cn>
-Date: Mon, 13 Oct 2025 18:25:00 +0800
-Subject: [PATCH] board: panther-x2: disable SPI flash and adjust SPL boot order
-
-This patch updates rk3566-panther-x2-u-boot.dtsi to:
-- Remove SPI flash from SPL boot order
-- Disable the SFC (SPI flash controller)
-- Ensure U-Boot only boots from SD and eMMC
-
-Signed-off-by: Desmond Dong <djhui@live.cn>
----
- arch/arm/dts/rk3566-panther-x2-u-boot.dtsi | 17 +----------------
- 1 file changed, 1 insertion(+), 16 deletions(-)
-
 diff --git a/arch/arm/dts/rk3566-panther-x2-u-boot.dtsi b/arch/arm/dts/rk3566-panther-x2-u-boot.dtsi
-index 6a2e86a42a..cdd7f3b2aa 100644
 --- a/arch/arm/dts/rk3566-panther-x2-u-boot.dtsi
 +++ b/arch/arm/dts/rk3566-panther-x2-u-boot.dtsi
 @@ -9,7 +9,7 @@
@@ -48,5 +32,3 @@ index 6a2e86a42a..cdd7f3b2aa 100644
  };
  
  &sdmmc2 {
--- 
-2.39.2
