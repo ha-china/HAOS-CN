@@ -90,13 +90,9 @@ jobs:
             git clone https://github.com/home-assistant/operating-system.git
           fi
           cp -r buildroot-external operating-system
-          sudo ln -sf /mnt/output "operating-system/output"
-          sudo chown -R "${WORKSPACE_OWNER}" /mnt/cache
-          sudo chown -R "${WORKSPACE_OWNER}" /mnt/output
-          ls -lh operating-system
           cd operating-system
           git submodule update --init
-
+          
       - name: Run private build script
         run: |
           chmod +x private/*.sh
