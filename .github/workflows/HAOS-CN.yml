@@ -80,6 +80,9 @@ jobs:
           chmod +x private/*.sh
           sudo private/release_space.sh
           sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+          sudo ln -sf /mnt/output "${GITHUB_WORKSPACE}/output"
+          sudo chown -R "${WORKSPACE_OWNER}" /mnt/cache
+          sudo chown -R "${WORKSPACE_OWNER}" /mnt/output
 
       - name: Clone source code and Change Settings.
         run: |
