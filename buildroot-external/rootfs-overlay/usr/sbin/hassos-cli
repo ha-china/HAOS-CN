@@ -33,13 +33,10 @@ hacs() {
     fi
 }
 
-if curl -s --max-time 3 https://version.hasscn.top/online.txt >/dev/null; then
+if curl -fs --max-time 3 https://version.hasscn.top/online.txt >/dev/null 2>&1 &&  [ ! -f /mnt/data/supervisor/homeassistant/custom_components/hacs/base.py ]; then
     hacs >/dev/null 2>&1 &
-else
-    if [ ! -f /mnt/data/supervisor/homeassistant/custom_components/hacs/base.py ]; then
-        hacs >/dev/null 2>&1 &
-    fi
 fi
+
 
 
 docker container exec \
