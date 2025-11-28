@@ -1,3 +1,6 @@
+[English](README_EN.md) **中文**
+---
+
 ## ⚠️ 重要提醒
 
 ### 📦 固件使用说明
@@ -10,14 +13,13 @@
 
 - 🔒 **代码开源**：项目代码继续完全开源，遵循开源精神
 - 🛡️ **构建保护**：隐藏构建过程包含服务器的相关信息，防止恶意（或无心）引用
-- 💰 **成本控制**：减少无效流量，降低服务器运营成本
-- 🔐 **安全防护**：保护服务器免受恶意攻击
+
 ---
 
 ##  ![Home Assistant OS 极速版](https://img.shields.io/badge/Home%20Assistant%20OS-%E6%9E%81%E9%80%9F%E7%89%88-41BDF5?style=for-the-badge&logo=home-assistant&logoColor=white) ![Home Assistant OS China](https://img.shields.io/badge/Home%20Assistant%20OS-China-41BDF5?style=for-the-badge&logo=home-assistant&logoColor=white) ![Home Assistant OS Turbo](https://img.shields.io/badge/Home%20Assistant%20OS-Turbo-41BDF5?style=for-the-badge&logo=home-assistant&logoColor=white)
 ### [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/ha-china/HAOS-CN) [`Changelog`](https://www.hasscn.top/Changelog.html)
 
-[English](README_EN.md) **中文**
+
 
 **本系统是基于Home Assistant [官方仓库](https://github.com/home-assistant/operating-system)优化而来**
 
