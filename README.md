@@ -1,153 +1,153 @@
-[English](README_EN.md) **中文**
+[中文说明, 请点击这里](README_CN.md)  
 ---
 
-## ⚠️ 重要提醒
+## ⚠️ Important Notice
 
-### 📦 固件使用说明
-- 🚫 **请勿错误的将测试版固件用于生产环境，测试版固件名称均包含`dev`**
----
+### 📦 Firmware Usage Guidelines
+- 🚫 **Do NOT use test versions of firmware in production environments. All test firmware filenames contain `dev`.**
 
-### 🛡️ 服务器保护措施
-
-由于近期服务器遭受大量无效流量（日均数万次无效请求），为保护服务器资源并降低运营成本，我们采取了以下措施：
-
-- 🔒 **代码开源**：项目代码继续完全开源，遵循开源精神
-- 🛡️ **构建保护**：隐藏构建过程包含服务器的相关信息，防止恶意（或无心）引用
+- 🎯 **Purpose of This Project:**  
+  Designed to allow Chinese users to seamlessly enjoy the native Home Assistant OS experience without worrying about network accessibility issues.
 
 ---
 
-##  ![Home Assistant OS 极速版](https://img.shields.io/badge/Home%20Assistant%20OS-%E6%9E%81%E9%80%9F%E7%89%88-41BDF5?style=for-the-badge&logo=home-assistant&logoColor=white) ![Home Assistant OS China](https://img.shields.io/badge/Home%20Assistant%20OS-China-41BDF5?style=for-the-badge&logo=home-assistant&logoColor=white) ![Home Assistant OS Turbo](https://img.shields.io/badge/Home%20Assistant%20OS-Turbo-41BDF5?style=for-the-badge&logo=home-assistant&logoColor=white)
+### 🛡️ Server Protection Measures
+
+Due to a recent surge of excessive invalid server requests (up to tens of thousands daily), to protect server resources and reduce operational costs, we've implemented the following strategies:
+
+- 🔒 **Open Source Commitment**: Project source code remains fully open, adhering strictly to the open source spirit.
+- 🛡️ **Build Information Protection**: Server-related information is concealed during the build process to prevent malicious or unintentional reference.
+
+---
+
+##  ![Home Assistant OS Turbo Edition](https://img.shields.io/badge/Home%20Assistant%20OS-%E6%9E%81%E9%80%9F%E7%89%88-41BDF5?style=for-the-badge&logo=home-assistant&logoColor=white) ![Home Assistant OS China](https://img.shields.io/badge/Home%20Assistant%20OS-China-41BDF5?style=for-the-badge&logo=home-assistant&logoColor=white) ![Home Assistant OS Turbo](https://img.shields.io/badge/Home%20Assistant%20OS-Turbo-41BDF5?style=for-the-badge&logo=home-assistant&logoColor=white)
 ### [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/ha-china/HAOS-CN) [`Changelog`](https://www.hasscn.top/Changelog.html)
 
 
+**This system is an optimized Home Assistant OS distribution, tailored specifically for users in China and based on the [official Home Assistant repository](https://github.com/home-assistant/operating-system).**
 
-**本系统是基于Home Assistant [官方仓库](https://github.com/home-assistant/operating-system)优化而来**
-
-### 🚀 网络加速优化
-- 🕵️‍♂️ `版本检测服务`迁移至国内腾讯BGP节点
-- 🛡️ `系统网络检查`迁移至国内腾讯BGP节点
-- ⏰ `时间同步服务器`迁移至国内公共节点
-- 🏫 `镜像拉取服务`迁移至国内腾讯BGP节点
-- 🔄 `OTA升级服务`迁移至国内腾讯BGP节点
-- ⚡ `系统下载地址`优化至国内腾讯BGP节点
-- 🐳 添加国内 [`docker.io`](https://github.com/dongyubin/DockerHub)镜像地址至系统
-- 📨 `后台自动错误报告`服务迁移至国内腾讯BGP节点
-
----
-
-### ⚙️ 系统配置优化
-- 🕰️ 默认时区设置为 `Asia/Shanghai`
-- 📅 系统更新频率调整为`每月28日`定期更新
-- 📢 终端页面添加`服务器赞助信息`声明
+### 🚀 Network Speed-Up Optimizations
+- 🕵️‍♂️ `Version check service` relocated to a Tencent BGP node in China
+- 🛡️ `System connectivity check` migrated to a China Tencent BGP node
+- ⏰ `Time synchronization server` switched to Mainland China public NTP servers
+- 🏫 `Image download service` uses Tencent BGP node in China
+- 🔄 `OTA update service` migrated to China Tencent BGP node
+- ⚡ `System download URLs` optimized for China through Tencent BGP
+- 🐳 Integrated Mainland China [`docker.io`](https://github.com/dongyubin/DockerHub) mirror into the system
+- 📨 `Automatic error reporting service` now running via China Tencent BGP node
 
 ---
 
-### 📦 加载项优化
-- ❌ 移除不稳定的 [`官方加载项源`](https://github.com/home-assistant/addons)
-- ❌ 移除不稳定的 [`官方社区源`](https://github.com/hassio-addons/repository)
-- ❌ 移除不稳定的 [`Music Assistant 源`](https://github.com/music-assistant/home-assistant-addon)
-- ❌ 移除不稳定的 [`ESP Home 源`](https://github.com/esphome/home-assistant-addon)
-- ✅ 添加经过全面优化与汉化的[`加载项源`](https://gitee.com/desmond_GT/hassio-addons/blob/main/README.md)为默认加载项源（上述移除内容均已包含在内）
+### ⚙️ System Configuration Enhancements
+- 🕰️ Default time zone set to `Asia/Shanghai`
+- 📅 System automatically updates on the 28th of each month
+- 📢 Terminal page now displays server sponsorship information
 
 ---
 
-### 🤖 智能安装体验
-- 🚦 系统启动时**自动**检测网络并安装 ![](https://img.shields.io/badge/HACS-%E6%9E%81%E9%80%9F%E7%89%88-41BDF5?style=for-the-badge&logo=home-assistant&logoColor=white)
-> 为了让更多人体验极速版，欢迎愿意共享 Token 的朋友[点击链接](https://tokenhub.hacs.vip/)共享
+### 📦 Add-ons Optimization
+- ❌ Removed unstable [`Official Add-ons`](https://github.com/home-assistant/addons) repository
+- ❌ Removed unstable [`Official Community`](https://github.com/hassio-addons/repository) repository
+- ❌ Removed unstable [`Music Assistant`](https://github.com/music-assistant/home-assistant-addon) repository
+- ❌ Removed unstable [`ESP Home`](https://github.com/esphome/home-assistant-addon) repository
+- ✅ Added a fully optimized and localized [`Add-ons source`](https://gitee.com/desmond_GT/hassio-addons/blob/main/README.md) as the default add-ons repository (including all of the above removals)
 
 ---
 
-> 🚀 *专为中国用户优化加速的 Home Assistant OS*
-
-- 🔧 保持系统原生体验，所有更改仅为提速优化以及合规性。
-- 🛡️ **所有个人或者商家均可免费使用此产品（愿意赞助的朋友可以扫下面二维码）**
-- 🛠️ 每月**27日**由 **GitHub Actions** 自动构建最新版。
-- ⭐ 如果觉得有帮助，欢迎点个 Star 支持！
+### 🤖 Intelligent Installation Experience
+- 🚦 On system startup, **automatically** detects the network and installs ![HACS-China](https://img.shields.io/badge/HACS-China-41BDF5?style=for-the-badge&logo=home-assistant&logoColor=white)
+> To help more users experience Turbo Edition, friends willing to share a Token are welcome to [share here](https://tokenhub.hacs.vip/)
 
 ---
 
-### 🚦 速度演示
+> 🚀 *A Home Assistant OS specifically optimized and accelerated for users in China*
 
-- [初始化速度演示](https://www.bilibili.com/video/BV1tr7VzCE35/?share_source=copy_web&vd_source=9b5dc5e48277a13da484e0352d3707e9)  
-  > 家庭宽带：1G约1~1.5分钟，500M约3分钟，100M约5分钟
+- 🔧 Maintains the official system experience; all adjustments are solely for acceleration and compliance.
+- 🛡️ **Free for all individuals and businesses (if you'd like to support the project, please scan the QR code below!)**
+- 🛠️ The newest version is automatically built **on the 27th of every month** by **GitHub Actions**
+- ⭐ If you find this helpful, please consider giving the project a Star!
 
-- [升级速度演示](https://www.bilibili.com/video/BV1judBY2ES7?t=82.3)  
-  > 升级速度与初始化类似
+---
+
+### 🚦 Speed Demonstration
+
+- [Initialization Speed Demonstration](https://www.bilibili.com/video/BV1tr7VzCE35/?share_source=copy_web&vd_source=9b5dc5e48277a13da484e0352d3707e9)  
+  > Download Bandwidth: 1Gbps about 1~1.5 minutes, 500Mbps around 3 minutes, 100Mbps about 5 minutes
+
+- [Upgrade Speed Demonstration](https://www.bilibili.com/video/BV1judBY2ES7?t=82.3)  
+  > Upgrade speed is similar to initialization
+
+
+---
+
+Thank you for your attention and support! If you have any questions, feel free to reach out anytime.
+
+- **Panther x2 (panther_x2)** adaptation source: [https://github.com/jianyun8023/operating-system](https://github.com/jianyun8023/operating-system)
+- **Sonoff iHost** adaptation source: [https://github.com/iHost-Open-Source-Project/ha-operating-system](https://github.com/iHost-Open-Source-Project/ha-operating-system)
+- **Orangepi CM4 (v1.3.1)** adaptation source: [https://github.com/hhuangpeiqi/home-assistant-OS](https://github.com/hhuangpeiqi/home-assistant-OS)
+> Hardware version v1.3.1 is verified; version v1.4 is not supported.
+---
+
+
+Thank you again for your understanding and support! 🙏
+
+## 🖥️ Device Adaptation Contributions Welcome
+
+🎉 Thank you for your willingness to contribute device adaptations to HAOS! To ensure user safety and system stability, all submitted code will be carefully reviewed. Thank you for your cooperation.
+
+⚠️ As the official team is gradually phasing out devices with arm32 architecture, only x86_64 and aarch64 device adaptations are generally accepted (device manufacturers may discuss exceptions).
+
+## 📝 PR Submission Guidelines
+
+To keep the project structure organized and ensure smooth multi-device compilations, please adhere to these guidelines:
+
+### 📂 Directory Structure Requirements
+- 🗂️ **Device configuration directories**  
+  Place them under `buildroot-external\board\`  
+  - 📍 Direct placement, e.g.: `board\orangepi_CM4`  
+  - 🏷️ Brand subdirectory, e.g.: `board\orangepi\computer_model4`
+
+- ⚙️ **Build configuration files**  
+  Place all defconfig files in `buildroot-external\config`  
+  Example: `orangepi_cm4_deconfig`
+
+- 📦 **Additional packages**  
+  Any extra packages should be added to the `packages` directory, one folder per package
+
+- ❓ **For files outside these directories**  
+  Please provide clear reasons in your submission
+
+## ⚡ Important Reminders
+1. 🚫 Do NOT edit HAOS official source files or other directories
+2. 🚫 Do NOT create directories outside those specified above
+3. 🔍 If there are questions regarding your code or your PR lacks sufficient description, you may be contacted for clarification
+4. ❌ Code submissions that cannot be reasonably explained will not be merged
+
+🤝 We look forward to building a better HAOS ecosystem in China together!
+
+🐛 If there are bugs or questions about the firmware you submit, please help respond in the issues area. Thank you very much!
 
 ---
 
 
+## Official Information
 
-##  官方信息
+- 🌐 Official Website: [https://www.hasscn.top](https://www.hasscn.top)
 
-- 🌐 官方网站：[https://www.hasscn.top](https://www.hasscn.top)
-
-- 📱 官方公众号
+- 📱 Official WeChat Public Account
 
 <div align="left">
-  <img src="./img/WeChat_QRCode.png" alt="关注我" width="400"/>
+  <img src="./img/WeChat_QRCode.png" alt="Follow me" width="400"/>
 </div>
 
----
 
-感谢您的关注与支持！如有疑问，欢迎随时联系我。
+## ☕ If you find this project helpful
 
-- **黑豹x2（panther_x2）** 适配来源：[https://github.com/jianyun8023/operating-system](https://github.com/jianyun8023/operating-system)
-- **Sonoff iHost** 适配来源：[https://github.com/iHost-Open-Source-Project/ha-operating-system](https://github.com/iHost-Open-Source-Project/ha-operating-system)
-- **Orangepi CM4（v1.3.1）** 适配来源：[https://github.com/hhuangpeiqi/home-assistant-OS](https://github.com/hhuangpeiqi/home-assistant-OS)
-> 已验证硬件版本v1.3.1，确认v1.4的硬件版本无法使用
----
+- Feel free to buy me a coffee~
 
 
+| WeChat | Alipay |
+|--------|--------|
+| ![WeChat](./img/WeChat_Pay.jpg) | ![Alipay](./img/Ali_Pay.jpg) |
 
-
-
-## ☕ 如果你觉得本项目对你有帮助
-
-- 欢迎请我喝杯咖啡~
-
-
-| 微信支持 | 支付宝支持 |
-|----------|------------|
-| ![微信](./img/WeChat_Pay.jpg) | ![支付宝](./img/Ali_Pay.jpg) |
-
-> 名单公示在[此页面上](https://www.hasscn.top/sponsor.html#-%E7%89%B9%E5%88%AB%E9%B8%A3%E8%B0%A2)
-
-
-感谢您的理解与支持！ 🙏
-
-## 🖥️ 欢迎参与机型适配
-
-🎉 首先，衷心感谢您愿意为 HAOS 贡献机型适配！为确保用户使用安全及系统稳定性，我们将对提交的代码进行严格审核，敬请理解。
-
-⚠️ 因官方开始淘汰 arm32 架构的设备，原则上只接受 x86_64 和 aarch64 的设备适配，厂家设备可协商
-
-## 📝 提交规范说明
-
-为保持项目结构清晰，避免多机型编译时出现混乱，请遵循以下规范：
-
-### 📂 目录结构要求
-- 🗂️ **机型配置目录**  
-  统一放置于 `buildroot-external\board\` 目录下  
-  - 📍 直接放置，如：`board\orangepi_CM4`  
-  - 🏷️ 按品牌分类，如：`board\orangepi\computer_model4`
-
-- ⚙️ **编译配置文件**  
-  所有 defconfig 文件请放入 `buildroot-external\config` 目录  
-  示例：`orangepi_cm4_deconfig`
-
-- 📦 **额外软件包**  
-  如需添加额外软件包，请统一放置于 `packages` 目录下，并确保一个软件包对应一个独立目录
-
-- ❓ **非指定目录文件**  
-  提交的时候请一定说清楚原因
-
-## ⚡ 重要注意事项
-1. 🚫 禁止修改 HAOS 官方源文件及其他目录
-2. 🚫 禁止创建非规范要求的额外目录
-3. 🔍 对于存在疑问的代码，如果提交时描述不够清楚我可能将与您沟通确认其作用
-4. ❌ 无法合理解释的代码将不予合并
-
-🤝 我们期待与您共同打造更完善的 HAOS 生态！
-
-🐛 如果用户对于您提交的固件有 bug 或者有疑问，还需要您在 issue 区帮忙回复，万分感谢！
+> The donor list is published [on this page](https://www.hasscn.top/sponsor.html#-%E7%89%B9%E5%88%AB%E9%B8%A3%E8%B0%A2)
