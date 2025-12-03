@@ -84,7 +84,7 @@ Thank you for your attention and support! If you have any questions, feel free t
 
 - **Panther x2 (panther_x2)** adaptation source: [https://github.com/jianyun8023/operating-system](https://github.com/jianyun8023/operating-system)
 - **Sonoff iHost** adaptation source: [https://github.com/iHost-Open-Source-Project/ha-operating-system](https://github.com/iHost-Open-Source-Project/ha-operating-system)
-- **Orangepi CM4 (v1.3.1)** adaptation source: [https://github.com/hhuangpeiqi/home-assistant-OS](https://github.com/hhuangpeiqi/home-assistant-OS)
+- **Orangepi CM4** adaptation source: [https://github.com/hhuangpeiqi/home-assistant-OS](https://github.com/hhuangpeiqi/home-assistant-OS)
 > Hardware version v1.3.1 is verified; version v1.4 is not supported.
 ---
 
