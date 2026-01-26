@@ -1,4 +1,4 @@
-name: HAOS-CN
+name: Build Home Assistant Turbo
 on:
   workflow_dispatch:
     inputs:
