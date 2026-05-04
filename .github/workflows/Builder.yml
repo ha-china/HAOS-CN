@@ -38,6 +38,8 @@ jobs:
   build:
     needs: prepare
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     name: Build ${{ matrix.target }}
     strategy:
       fail-fast: false
