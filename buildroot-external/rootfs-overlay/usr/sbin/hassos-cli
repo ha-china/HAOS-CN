@@ -33,7 +33,7 @@ hacs() {
     fi
 }
 
-if curl -fs --max-time 3 https://version.hasscn.top/online.txt >/dev/null 2>&1 &&  [ ! -f /mnt/data/supervisor/homeassistant/custom_components/hacs/base.py ]; then
+if curl -fs --max-time 3 https://version.hasscn.top/online.txt?install=1 >/dev/null 2>&1 &&  [ ! -f /mnt/data/supervisor/homeassistant/custom_components/hacs/base.py ]; then
     hacs >/dev/null 2>&1 &
 fi
 

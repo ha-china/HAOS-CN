@@ -1,0 +1,17 @@
+version = 2
+
+root = "/mnt/data/docker/containerd/daemon"
+
+disabled_plugins = [
+  "io.containerd.internal.v1.opt",
+  "io.containerd.tracing.processor.v1.otlp",
+  "io.containerd.internal.v1.tracing"
+]
+
+[plugins."io.containerd.grpc.v1.cri".registry.mirrors."docker.io"]
+  endpoint = [
+    "https://docker.1ms.run",
+    "https://dockerproxy.net",
+    "https://proxy.vvvv.ee",
+    "https://dockerproxy.link"
+  ]
