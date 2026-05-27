@@ -18,6 +18,10 @@ Due to a recent surge of excessive invalid server requests (up to tens of thousa
 - 🔒 **Open Source Commitment**: Project source code remains fully open, adhering strictly to the open source spirit.
 - 🛡️ **Build Information Protection**: Server-related information is concealed during the build process to prevent malicious or unintentional reference.
 
+### ❤️ Server Sponsor
+
+> **Infrastructure for this project is generously sponsored by [Shenzhen Coolkit Technology Co., Ltd.](https://www.coolkit.cn/).**
+
 ---
 
 ##  ![Home Assistant OS Turbo Edition](https://img.shields.io/badge/Home%20Assistant%20OS-%E6%9E%81%E9%80%9F%E7%89%88-41BDF5?style=for-the-badge&logo=home-assistant&logoColor=white) ![Home Assistant OS China](https://img.shields.io/badge/Home%20Assistant%20OS-China-41BDF5?style=for-the-badge&logo=home-assistant&logoColor=white) ![Home Assistant OS Turbo](https://img.shields.io/badge/Home%20Assistant%20OS-Turbo-41BDF5?style=for-the-badge&logo=home-assistant&logoColor=white)

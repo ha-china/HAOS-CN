@@ -13,6 +13,10 @@
 - 🔒 **代码开源**：项目代码继续完全开源，遵循开源精神
 - 🛡️ **构建保护**：隐藏构建过程包含服务器的相关信息，防止恶意（或无心）引用
 
+### ❤️ 服务器赞助
+
+> **本项目服务器基础设施由[深圳酷宅科技有限公司](https://www.coolkit.cn/)提供赞助支持。**
+
 ---
 
 ##  ![Home Assistant OS 极速版](https://img.shields.io/badge/Home%20Assistant%20OS-%E6%9E%81%E9%80%9F%E7%89%88-41BDF5?style=for-the-badge&logo=home-assistant&logoColor=white) ![Home Assistant OS China](https://img.shields.io/badge/Home%20Assistant%20OS-China-41BDF5?style=for-the-badge&logo=home-assistant&logoColor=white) ![Home Assistant OS Turbo](https://img.shields.io/badge/Home%20Assistant%20OS-Turbo-41BDF5?style=for-the-badge&logo=home-assistant&logoColor=white)
