@@ -144,3 +144,21 @@ jobs:
           file_glob: true
           body: ${{ env.RELEASE_BODY }}
           prerelease: ${{ github.ref != 'refs/heads/main' }}
+
+  trigger-full-images:
+    needs: build
+    if: github.ref_name == 'main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Dispatch full image workflow
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT }}
+          CHANNEL: stable
+        run: |
+          curl -L -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${GH_TOKEN}" \
+            https://api.github.com/repos/ha-china/operating-system-full-images/actions/workflows/build-channel.yml/dispatches \
+            -d "{\"ref\":\"main\",\"inputs\":{\"channel\":\"${CHANNEL}\"}}"
