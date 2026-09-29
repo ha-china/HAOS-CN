@@ -5,10 +5,11 @@
     },
     "data-root": "/mnt/data/docker",
     "bip": "172.30.232.1/23",
+    "ipv6": true,
     "registry-mirrors": [
         "https://docker.1ms.run",
         "https://dockerproxy.net",
         "https://proxy.vvvv.ee",
         "https://dockerproxy.link"
-      ]
+    ]
 }
