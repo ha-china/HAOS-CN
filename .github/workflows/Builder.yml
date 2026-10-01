@@ -6,6 +6,11 @@ on:
         description: 'Targets to build (comma separated)'
         required: false
         default: 'rpi3_64,rpi4_64,rpi5_64,ova,generic_x86_64,generic_aarch64,green,yellow,panther_x2,orangepi_cm4'
+      run_tests:
+        description: 'Run QEMU boot tests after build (uses the ova image)'
+        required: false
+        type: boolean
+        default: true
 
 #  schedule:
 #    - cron: '0 18 26 * *'
@@ -17,7 +22,7 @@ on:
 
 jobs:
   prepare:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
@@ -37,7 +42,9 @@ jobs:
 
   build:
     needs: prepare
-    runs-on: ubuntu-latest
+    outputs:
+      image_version: ${{ steps.image_version.outputs.version }}
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
     name: Build ${{ matrix.target }}
@@ -95,6 +102,42 @@ jobs:
           cd operating-system
           git submodule update --init
           
+      - name: Set dev version suffix
+        if: github.ref_name != 'main'
+        run: |
+          VERSION_DEV="dev$(date --utc +'%Y%m%d')"
+          sed -i -E "s/(^VERSION_SUFFIX=\").*(\"$)/\1${VERSION_DEV}\2/" operating-system/buildroot-external/meta
+          grep '^VERSION_SUFFIX' operating-system/buildroot-external/meta
+
+      - name: Check signing certificate validity
+        env:
+          RAUC_CERTIFICATE: ${{ secrets.RAUC_CERTIFICATE }}
+        run: |
+          echo -e "-----BEGIN CERTIFICATE-----\n${RAUC_CERTIFICATE}\n-----END CERTIFICATE-----" > signing-cert.pem
+          if bash operating-system/scripts/check-signing-validity.sh signing-cert.pem operating-system/buildroot-external/ota/rel-ca.pem 760; then
+            rm -f signing-cert.pem
+            exit 0
+          fi
+          echo "::warning::Signing certificate does not chain to rel-ca.pem (normal for self-signed setups, the cert gets appended to the image keyring). Falling back to a leaf-certificate expiry check."
+          THRESHOLD=$(date -u -d "+760 days" +%s)
+          ENDDATE=$(openssl x509 -in signing-cert.pem -noout -enddate | cut -d= -f2)
+          if [ "$(date -u -d "${ENDDATE}" +%s)" -lt "${THRESHOLD}" ]; then
+            echo "::error::Signing certificate expires ${ENDDATE} (within 760 days). Rotate the RAUC_CERTIFICATE secret before releasing."
+            exit 1
+          fi
+          echo "Signing certificate is valid until ${ENDDATE} (>= 760 days)."
+          rm -f signing-cert.pem
+
+      - name: Compute image version
+        id: image_version
+        run: |
+          . operating-system/buildroot-external/meta
+          if [ -n "${VERSION_SUFFIX}" ]; then
+            echo "version=${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_SUFFIX}" >> "$GITHUB_OUTPUT"
+          else
+            echo "version=${VERSION_MAJOR}.${VERSION_MINOR}" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Run private build script
         run: |
           chmod +x private/*.sh
@@ -104,6 +147,14 @@ jobs:
           RAUC_CERTIFICATE: ${{ secrets.RAUC_CERTIFICATE }}
           RAUC_PRIVATE_KEY: ${{ secrets.RAUC_PRIVATE_KEY }}
 
+      - name: Restore ccache
+        uses: actions/cache/restore@v4
+        with:
+          path: /mnt/cache/cc
+          key: haos-cc-${{ matrix.target }}-${{ github.run_id }}
+          restore-keys: |
+            haos-cc-${{ matrix.target }}-
+
  
       - name: Log in to Docker Hub
         uses: docker/login-action@v4
@@ -111,13 +162,43 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build 
+      - name: Build
         shell: 'script -q -e -c "bash {0}"'
         id: build
+        env:
+          CACHE_DIR: /mnt/cache
         run: |
-          sleep $((RANDOM % 600))    
+          sleep $((RANDOM % 600))
           cd operating-system
           scripts/enter.sh make ${{matrix.target}}
+
+      - name: Check Linux kernel config
+        run: |
+          cd operating-system
+          scripts/enter.sh make linux-check-dotconfig BR2_CHECK_DOTCONFIG_OPTS="--github-format --strip-path-prefix=/build/"
+
+      - name: Prune stale ccache objects
+        run: |
+          if [ -d /mnt/cache/cc ] && [ -f operating-system/output/Makefile ]; then
+            find /mnt/cache/cc -mindepth 1 -type f -not -anewer operating-system/output/Makefile -delete
+            echo "ccache objects remaining: $(find /mnt/cache/cc -mindepth 1 -type f | wc -l)"
+          fi
+
+      - name: Save ccache
+        if: github.ref_name == 'dev'
+        uses: actions/cache/save@v4
+        with:
+          path: /mnt/cache/cc
+          key: haos-cc-${{ matrix.target }}-${{ github.run_id }}
+
+      - name: Upload QEMU image artifact for tests
+        if: matrix.target == 'ova'
+        uses: actions/upload-artifact@v4
+        with:
+          name: haos_ova-${{ steps.image_version.outputs.version }}.qcow2.xz
+          path: operating-system/output/images/haos_ova-*.qcow2.xz
+          retention-days: 3
+          if-no-files-found: error
 
           
 
@@ -130,7 +211,7 @@ jobs:
       - name: Set tag and body for dev release
         if: github.ref_name != 'main'
         run: |
-          echo "RELEASE_TAG=dev-${CURRENT_VERSION}" >> $GITHUB_ENV
+          echo "RELEASE_TAG=dev-${{ steps.image_version.outputs.version }}" >> $GITHUB_ENV
           echo "RELEASE_BODY=此为开发版，请不要当正式版使用" >> $GITHUB_ENV
 
       - name: Upload images to release
@@ -148,7 +229,7 @@ jobs:
   trigger-full-images:
     needs: build
     if: github.ref_name == 'main'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
     steps:
@@ -162,3 +243,57 @@ jobs:
             -H "Authorization: Bearer ${GH_TOKEN}" \
             https://api.github.com/repos/ha-china/operating-system-full-images/actions/workflows/build-channel.yml/dispatches \
             -d "{\"ref\":\"main\",\"inputs\":{\"channel\":\"${CHANNEL}\"}}"
+
+  test:
+    name: Test HAOS image in QEMU
+    needs: build
+    if: ${{ inputs.run_tests == true }}
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Clone upstream test suite
+        run: |
+          git clone --depth 1 https://github.com/home-assistant/operating-system.git -b dev os-src
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y qemu-system-x86 ovmf
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Python requirements
+        run: pip install -r os-src/tests/requirements.txt
+
+      - name: Download OS image
+        uses: actions/download-artifact@v4
+        with:
+          name: haos_ova-${{ needs.build.outputs.image_version }}.qcow2.xz
+          path: image
+
+      - name: Extract OS image
+        run: |
+          xz -dc image/haos_ova-*.qcow2.xz > os-src/tests/haos.qcow2
+
+      - name: Enable KVM group perms
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Run tests
+        run: |
+          cd os-src
+          ./tests/run_tests.sh --durations=0 --durations-min=5.0
+
+      - name: Archive test logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-logs
+          retention-days: 7
+          path: |
+            os-src/tests/lg_logs/**
+            os-src/tests/junit_reports/*.xml
