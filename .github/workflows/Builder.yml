@@ -113,14 +113,21 @@ jobs:
         env:
           RAUC_CERTIFICATE: ${{ secrets.RAUC_CERTIFICATE }}
         run: |
-          echo -e "-----BEGIN CERTIFICATE-----\n${RAUC_CERTIFICATE}\n-----END CERTIFICATE-----" > signing-cert.pem
+          echo -e "${RAUC_CERTIFICATE}" > signing-cert.pem
+          if ! grep -q "BEGIN CERTIFICATE" signing-cert.pem; then
+            echo -e "-----BEGIN CERTIFICATE-----\n${RAUC_CERTIFICATE}\n-----END CERTIFICATE-----" > signing-cert.pem
+          fi
           if bash operating-system/scripts/check-signing-validity.sh signing-cert.pem operating-system/buildroot-external/ota/rel-ca.pem 760; then
             rm -f signing-cert.pem
             exit 0
           fi
           echo "::warning::Signing certificate does not chain to rel-ca.pem (normal for self-signed setups, the cert gets appended to the image keyring). Falling back to a leaf-certificate expiry check."
-          THRESHOLD=$(date -u -d "+760 days" +%s)
           ENDDATE=$(openssl x509 -in signing-cert.pem -noout -enddate | cut -d= -f2)
+          if [ -z "${ENDDATE}" ]; then
+            echo "::error::Cannot read the signing certificate. Check the RAUC_CERTIFICATE secret format (full PEM expected)."
+            exit 1
+          fi
+          THRESHOLD=$(date -u -d "+760 days" +%s)
           if [ "$(date -u -d "${ENDDATE}" +%s)" -lt "${THRESHOLD}" ]; then
             echo "::error::Signing certificate expires ${ENDDATE} (within 760 days). Rotate the RAUC_CERTIFICATE secret before releasing."
             exit 1
