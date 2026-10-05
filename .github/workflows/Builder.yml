@@ -145,6 +145,11 @@ jobs:
             echo "version=${VERSION_MAJOR}.${VERSION_MINOR}" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Adjust NTP fallback for CN and CI
+        run: |
+          sed -i 's|^FallbackNTP=time.cloudflare.com$|FallbackNTP=cn.ntp.org.cn time.windows.com|' operating-system/buildroot-external/rootfs-overlay/etc/systemd/timesyncd.conf
+          grep -q '^FallbackNTP=cn.ntp.org.cn time.windows.com' operating-system/buildroot-external/rootfs-overlay/etc/systemd/timesyncd.conf
+
       - name: Run private build script
         run: |
           chmod +x private/*.sh
@@ -293,7 +298,9 @@ jobs:
       - name: Run tests
         run: |
           cd os-src
-          ./tests/run_tests.sh --durations=0 --durations-min=5.0
+          # CN 定制 supervisor 的插件商店走 gitee 镜像且禁用了社区源(supervisor.sh 补丁),
+          # 美国测试机上加载不到商店,app 安装/恢复类用例在此环境必失败,故排除。
+          ./tests/run_tests.sh --durations=0 --durations-min=5.0 -k "not test_app_install and not test_restore_backup"
 
       - name: Archive test logs
         if: always()
