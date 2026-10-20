@@ -1,0 +1,65 @@
+name: Sync kernel versions
+
+on:
+  schedule:
+    - cron: '0 18 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: kernel-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          ref: dev
+
+      - name: Get upstream kernel version
+        run: |
+          ver=$(curl -sfL https://raw.githubusercontent.com/home-assistant/operating-system/main/buildroot-external/configs/green_defconfig \
+            | sed -n 's/^BR2_LINUX_KERNEL_CUSTOM_VERSION_VALUE="\([^"]*\)".*/\1/p')
+          if [ -z "$ver" ]; then
+            echo "::error::无法从上游 green_defconfig 提取内核版本"
+            exit 1
+          fi
+          echo "UPSTREAM_KERNEL=$ver" >> $GITHUB_ENV
+
+      - name: Get latest 6.12 longterm from kernel.org
+        run: |
+          ver=$(curl -sfL https://www.kernel.org/releases.json \
+            | jq -r '[.releases[].version | select(startswith("6.12."))] | sort_by(split(".") | map(tonumber)) | last')
+          if [ -z "$ver" ] || [ "$ver" = "null" ]; then
+            echo "::error::无法从 kernel.org 获取最新 6.12 longterm"
+            exit 1
+          fi
+          echo "LONGTERM_612=$ver" >> $GITHUB_ENV
+
+      - name: Update defconfigs
+        run: |
+          sed -i "s/^BR2_LINUX_KERNEL_CUSTOM_VERSION_VALUE=.*/BR2_LINUX_KERNEL_CUSTOM_VERSION_VALUE=\"${UPSTREAM_KERNEL}\"/" \
+            buildroot-external/configs/orangepi_cm4_defconfig \
+            buildroot-external/configs/panther_x2_defconfig
+          sed -i "s/^BR2_LINUX_KERNEL_CUSTOM_VERSION_VALUE=.*/BR2_LINUX_KERNEL_CUSTOM_VERSION_VALUE=\"${LONGTERM_612}\"/" \
+            buildroot-external/configs/ihost_defconfig
+          git diff --stat
+
+      - name: Create PR
+        uses: peter-evans/create-pull-request@v7
+        with:
+          base: dev
+          branch: chore/kernel-sync
+          delete-branch: true
+          commit-message: "sync kernel: orangepi_cm4/panther_x2 → ${{ env.UPSTREAM_KERNEL }}, ihost → ${{ env.LONGTERM_612 }}"
+          title: "sync kernel: orangepi_cm4/panther_x2 → ${{ env.UPSTREAM_KERNEL }}, ihost → ${{ env.LONGTERM_612 }}"
+          body: |
+            自动同步内核版本（每日检查，无变化时不创建 PR）：
+            - orangepi_cm4 / panther_x2: 跟随上游 [home-assistant/operating-system main](https://github.com/home-assistant/operating-system/blob/main/buildroot-external/configs/green_defconfig) → **${{ env.UPSTREAM_KERNEL }}**
+            - ihost: 跟随 kernel.org 6.12 longterm → **${{ env.LONGTERM_612 }}**
