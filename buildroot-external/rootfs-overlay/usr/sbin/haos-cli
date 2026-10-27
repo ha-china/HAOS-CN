@@ -1,6 +1,6 @@
 #!/bin/sh
 # ==============================================================================
-# Home Assistant OTA + HACS background installer launcher
+# Home Assistant CLI launcher
 # ==============================================================================
 
 echo -e "OTA service kindly sponsored by Coolkit: \033[32mhttps://www.coolkit.cn/\033[0m"
@@ -39,28 +39,6 @@ while [ ! "$(docker ps -q -f name=hassio_cli)" ]; do
         emergency_shell
     fi
 done
-
-hacs() {
-    echo "Installing HACS China..."
-    local hacs_dir="/mnt/data/supervisor/homeassistant/custom_components/hacs/"
-    local hacs_url="https://ota.hasscn.top/hacs.zip"
-    mkdir -p "$hacs_dir"
-    rm -rf "$hacs_dir"/*
-
-    if curl --retry 5 --retry-connrefused -C - -L -o "${hacs_dir}hacs.zip" "$hacs_url"; then
-        cd "$hacs_dir" && unzip -oq hacs.zip && rm -f hacs.zip
-        docker restart homeassistant
-        echo "HACS installed successfully!"
-    else
-        echo "[ERROR] Failed to download HACS package."
-    fi
-}
-
-if curl -fs --max-time 3 https://version.hasscn.top/online.txt?install=1 >/dev/null 2>&1 &&  [ ! -f /mnt/data/supervisor/homeassistant/custom_components/hacs/base.py ]; then
-    hacs >/dev/null 2>&1 &
-fi
-
-
 
 docker container exec \
     -ti hassio_cli \
