@@ -194,7 +194,8 @@ jobs:
           fi
           sudo apt-get update -qq
           sudo apt-get install -y -qq erofs-utils squashfs-tools
-          VER="${CURRENT_VERSION:-18.4}"
+          VER=$(curl -s https://api.github.com/repos/home-assistant/operating-system/releases/latest | jq -r '.tag_name')
+          echo "official release for compare: ${VER}"
           echo "=== SIZE COMPARE (official vs ours) ==="
           curl -sfL -o /tmp/official.raucb "https://github.com/home-assistant/operating-system/releases/download/${VER}/haos_generic-x86-64-${VER}.raucb"
           unsquashfs -n -d /tmp/official_extract /tmp/official.raucb rootfs.img >/dev/null
@@ -208,8 +209,6 @@ jobs:
           mkdir -p rootfs-analysis
           cp official_dump.txt ours_dump.txt rootfs-analysis/
           stat -c '%s %n' /tmp/official_extract/rootfs.img "$IMG" > rootfs-analysis/sizes.txt
-        env:
-          CURRENT_VERSION: ${{ env.CURRENT_VERSION }}
 
       - name: Upload rootfs analysis
         if: always()
