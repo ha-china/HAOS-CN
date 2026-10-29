@@ -71,9 +71,9 @@ jobs:
         if: always()
         run: |
           IMG=operating-system/output/images/rootfs.erofs
-          DUMP=operating-system/output/host/bin/dump.erofs
-          if [ ! -f "$IMG" ] || [ ! -x "$DUMP" ]; then
-            echo "rootfs.erofs or dump.erofs missing, cannot analyze"
+          HOSTBIN=operating-system/output/host/bin
+          if [ ! -f "$IMG" ] || [ ! -x "$HOSTBIN/fsck.erofs" ]; then
+            echo "rootfs.erofs or fsck.erofs missing, cannot analyze"
             exit 0
           fi
           mkdir -p analysis
@@ -84,31 +84,49 @@ jobs:
           sudo apt-get install -y -qq squashfs-tools
           unsquashfs -n -d /tmp/official_extract /tmp/official.raucb rootfs.img >/dev/null
           OFFICIAL=/tmp/official_extract/rootfs.img
-          {
-            echo "=== SIZE ==="
-            stat -c '%s %n' "$OFFICIAL" "$IMG"
-            echo "=== OFFICIAL SUMMARY ==="
-            "$DUMP" -s "$OFFICIAL" 2>&1
-            echo "=== OURS SUMMARY ==="
-            "$DUMP" -s "$IMG" 2>&1
-          } | tee analysis/report.txt
-          "$DUMP" "$OFFICIAL" > analysis/official_dump.txt 2>&1 || true
-          "$DUMP" "$IMG" > analysis/ours_dump.txt 2>&1 || true
-          norm() { sed -E 's/0x[0-9a-fA-F]+//g; s/\b1[0-9]{9}\b//g' "$1"; }
-          norm analysis/official_dump.txt > /tmp/off.norm
-          norm analysis/ours_dump.txt > /tmp/ours.norm
-          diff -u /tmp/off.norm /tmp/ours.norm > analysis/list.diff || true
-          {
-            echo "=== DIFF (first 100 lines) ==="
-            head -100 analysis/list.diff
-            echo "=== DIFF lines: $(wc -l < analysis/list.diff) ==="
-          } | tee -a analysis/report.txt
+          rm -rf /tmp/off_tree /tmp/our_tree
+          "$HOSTBIN/fsck.erofs" --extract=/tmp/off_tree "$OFFICIAL" >/dev/null 2>&1 || true
+          "$HOSTBIN/fsck.erofs" --extract=/tmp/our_tree "$IMG" >/dev/null 2>&1 || true
+          (cd /tmp/off_tree && find . -type f -printf '%s\t%p\n' | sort -k2) > analysis/official_files.txt
+          (cd /tmp/our_tree && find . -type f -printf '%s\t%p\n' | sort -k2) > analysis/our_files.txt
+          python3 - <<'EOF' | tee analysis/report.txt
+          import collections
+          def load(p):
+              d = {}
+              for line in open(p, encoding='utf-8', errors='replace'):
+                  parts = line.rstrip('\n').split('\t', 1)
+                  if len(parts) == 2:
+                      d[parts[1]] = int(parts[0])
+              return d
+          off = load('analysis/official_files.txt')
+          our = load('analysis/our_files.txt')
+          print(f'official: {len(off)} files, {sum(off.values()):,} bytes (raw)')
+          print(f'ours:     {len(our)} files, {sum(our.values()):,} bytes (raw)')
+          only_our = {k: our[k] for k in our.keys() - off.keys()}
+          only_off = {k: off[k] for k in off.keys() - our.keys()}
+          changed = {k: (off[k], our[k]) for k in off.keys() & our.keys() if off[k] != our[k]}
+          print(f'\n== files only in OURS ({len(only_our)}) ==')
+          for k, v in sorted(only_our.items(), key=lambda x: -x[1]):
+              print(f'  +{v:>10,}  {k}')
+          print(f'\n== files only in OFFICIAL ({len(only_off)}) ==')
+          for k, v in sorted(only_off.items(), key=lambda x: -x[1]):
+              print(f'  -{v:>10,}  {k}')
+          print(f'\n== files with different size ({len(changed)}) ==')
+          tot = 0
+          for k, (a, b) in sorted(changed.items(), key=lambda x: -(x[1][1] - x[1][0])):
+              d = b - a
+              tot += d
+              print(f'  {d:>+12,}  {k}  (official {a:,} -> ours {b:,})')
+          print(f'\nnet raw delta from changed files: {tot:+,}')
+          EOF
 
       - name: Upload analysis artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: rootfs-analysis
-          path: analysis/
-          retention-days: 7
+          path: |
+            analysis/
+            operating-system/output/images/rootfs.erofs
+          retention-days: 5
           if-no-files-found: ignore
