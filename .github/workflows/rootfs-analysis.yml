@@ -119,6 +119,18 @@ jobs:
               print(f'  {d:>+12,}  {k}  (official {a:,} -> ours {b:,})')
           print(f'\nnet raw delta from changed files: {tot:+,}')
           EOF
+          # 深挖:对比差异最大的内核模块的 ELF section 表与文件尾部(模块签名)
+          sudo apt-get install -y -qq binutils >/dev/null 2>&1 || true
+          KO_REL=usr/lib/modules/6.18.58-haos/kernel/drivers/gpu/drm/amd/amdgpu/amdgpu.ko
+          if [ -f /tmp/off_tree/$KO_REL ] && [ -f /tmp/our_tree/$KO_REL ]; then
+            readelf -S /tmp/off_tree/$KO_REL > analysis/official_amdgpu_sections.txt 2>&1 || true
+            readelf -S /tmp/our_tree/$KO_REL > analysis/our_amdgpu_sections.txt 2>&1 || true
+            diff -u analysis/official_amdgpu_sections.txt analysis/our_amdgpu_sections.txt > analysis/amdgpu_sections.diff || true
+            echo "=== amdgpu.ko section diff ===" | tee -a analysis/report.txt
+            cat analysis/amdgpu_sections.diff | tee -a analysis/report.txt
+            tail -c 2048 /tmp/off_tree/$KO_REL | xxd > analysis/official_amdgpu_tail.txt 2>/dev/null || true
+            tail -c 2048 /tmp/our_tree/$KO_REL | xxd > analysis/our_amdgpu_tail.txt 2>/dev/null || true
+          fi
 
       - name: Upload analysis artifacts
         if: always()
