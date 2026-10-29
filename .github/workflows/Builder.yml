@@ -184,44 +184,6 @@ jobs:
           cd operating-system
           scripts/enter.sh make ${{matrix.target}}
 
-      - name: Analyze rootfs vs official release
-        if: always()
-        run: |
-          IMG=operating-system/output/images/rootfs.erofs
-          if [ ! -f "$IMG" ]; then
-            echo "rootfs.erofs not produced, skip analysis"
-            exit 0
-          fi
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq erofs-utils squashfs-tools
-          VER="${CURRENT_VERSION:-18.4}"
-          echo "=== SIZE COMPARE (official vs ours) ==="
-          curl -sfL -o /tmp/official.raucb "https://github.com/home-assistant/operating-system/releases/download/${VER}/haos_generic-x86-64-${VER}.raucb"
-          unsquashfs -n -d /tmp/official_extract /tmp/official.raucb rootfs.img >/dev/null
-          stat -c '%s %n' /tmp/official_extract/rootfs.img "$IMG" || true
-          echo "=== OFFICIAL SUMMARY ==="
-          dump.erofs -s /tmp/official_extract/rootfs.img || true
-          echo "=== OURS SUMMARY ==="
-          dump.erofs -s "$IMG" || true
-          dump.erofs /tmp/official_extract/rootfs.img > official_dump.txt 2>/dev/null || true
-          dump.erofs "$IMG" > ours_dump.txt 2>/dev/null || true
-          mkdir -p rootfs-analysis
-          cp official_dump.txt ours_dump.txt rootfs-analysis/
-          stat -c '%s %n' /tmp/official_extract/rootfs.img "$IMG" > rootfs-analysis/sizes.txt
-        env:
-          CURRENT_VERSION: ${{ env.CURRENT_VERSION }}
-
-      - name: Upload rootfs analysis
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: rootfs-analysis
-          path: |
-            rootfs-analysis/
-            operating-system/output/images/rootfs.erofs
-          retention-days: 5
-          if-no-files-found: ignore
-
       - name: Check Linux kernel config
         run: |
           cd operating-system
