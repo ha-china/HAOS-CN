@@ -43,6 +43,8 @@ jobs:
           cd operating-system
           git submodule update --init
           sed -i 's|^FallbackNTP=time.cloudflare.com$|FallbackNTP=cn.ntp.org.cn time.windows.com|' buildroot-external/rootfs-overlay/etc/systemd/timesyncd.conf
+          # 测试变体:禁用 ccache,验证内核模块 .comment 混链消失
+          sed -i '/^BR2_CCACHE=y$/d' buildroot-external/configs/*_defconfig
 
       - name: Run private build script
         run: |
@@ -119,17 +121,20 @@ jobs:
               print(f'  {d:>+12,}  {k}  (official {a:,} -> ours {b:,})')
           print(f'\nnet raw delta from changed files: {tot:+,}')
           EOF
-          # 深挖:对比差异最大的内核模块的 ELF section 表与文件尾部(模块签名)
-          sudo apt-get install -y -qq binutils >/dev/null 2>&1 || true
+          # 深挖:对比差异最大的内核模块的 ELF section 表与 .comment 内容(编译器版本字符串)
           KO_REL=usr/lib/modules/6.18.58-haos/kernel/drivers/gpu/drm/amd/amdgpu/amdgpu.ko
           if [ -f /tmp/off_tree/$KO_REL ] && [ -f /tmp/our_tree/$KO_REL ]; then
             readelf -S /tmp/off_tree/$KO_REL > analysis/official_amdgpu_sections.txt 2>&1 || true
             readelf -S /tmp/our_tree/$KO_REL > analysis/our_amdgpu_sections.txt 2>&1 || true
             diff -u analysis/official_amdgpu_sections.txt analysis/our_amdgpu_sections.txt > analysis/amdgpu_sections.diff || true
-            echo "=== amdgpu.ko section diff ===" | tee -a analysis/report.txt
-            cat analysis/amdgpu_sections.diff | tee -a analysis/report.txt
-            tail -c 2048 /tmp/off_tree/$KO_REL | xxd > analysis/official_amdgpu_tail.txt 2>/dev/null || true
-            tail -c 2048 /tmp/our_tree/$KO_REL | xxd > analysis/our_amdgpu_tail.txt 2>/dev/null || true
+            {
+              echo "=== .comment strings (official) ==="
+              readelf -p .comment /tmp/off_tree/$KO_REL 2>&1 || true
+              echo "=== .comment strings (ours) ==="
+              readelf -p .comment /tmp/our_tree/$KO_REL 2>&1 || true
+            } > analysis/amdgpu_comment.txt || true
+            tail -c 4096 /tmp/off_tree/$KO_REL | xxd > analysis/official_amdgpu_tail.txt 2>/dev/null || true
+            tail -c 4096 /tmp/our_tree/$KO_REL | xxd > analysis/our_amdgpu_tail.txt 2>/dev/null || true
           fi
 
       - name: Upload analysis artifacts
