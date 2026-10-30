@@ -55,6 +55,14 @@ jobs:
           RAUC_CERTIFICATE: ${{ secrets.RAUC_CERTIFICATE }}
           RAUC_PRIVATE_KEY: ${{ secrets.RAUC_PRIVATE_KEY }}
 
+      - name: Restore official hassio source for CI (analysis only)
+        run: |
+          # hasscn.top 镜像源在 CI 上拉 supervisor blob 持续 EOF;runner 在海外,
+          # 分析构建直接用官方源。supervisor 镜像只进 data 分区,不影响 rootfs 对比。
+          cd operating-system
+          sed -i 's|ghcr.hasscn.top/ha-china|ghcr.io/home-assistant|g' buildroot-external/package/hassio/dind-import-containers.sh buildroot-external/rootfs-overlay/usr/sbin/haos-supervisor
+          sed -i 's|version.hasscn.top|version.home-assistant.io|g' buildroot-external/package/hassio/hassio.mk buildroot-external/rootfs-overlay/usr/sbin/haos-supervisor
+
       - name: Log in to Docker Hub
         uses: docker/login-action@v4
         with:
