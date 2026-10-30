@@ -42,6 +42,8 @@ jobs:
           cp -r buildroot-external operating-system
           cd operating-system
           git submodule update --init
+          # 验证:1) 不对 buildroot 做 sed(避免 -dirty) 2) 清除 buildroot tag(让 gcc 版本串与官方等长)
+          git -C buildroot tag -l | xargs -r git -C buildroot tag -d >/dev/null
           sed -i 's|^FallbackNTP=time.cloudflare.com$|FallbackNTP=cn.ntp.org.cn time.windows.com|' buildroot-external/rootfs-overlay/etc/systemd/timesyncd.conf
           # 测试变体:禁用 ccache,验证内核模块 .comment 混链消失
           sed -i '/^BR2_CCACHE=y$/d' buildroot-external/configs/*_defconfig
