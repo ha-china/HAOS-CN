@@ -56,7 +56,7 @@
 
 ### 🤖 智能安装体验
 - 🚦 系统启动时**自动**检测网络并安装 ![](https://img.shields.io/badge/HACS-%E6%9E%81%E9%80%9F%E7%89%88-41BDF5?style=for-the-badge&logo=home-assistant&logoColor=white)
-> 为了让更多人体验极速版，欢迎愿意共享 Token 的朋友[点击链接](https://tokenhub.hacs.vip/)共享
+> 为了让更多人丝滑地使用 Home Assistant 内的 Marketplace，欢迎愿意共享 Token 的朋友[点击链接](https://hamrelay.hasscn.top/)共享
 
 ---
 

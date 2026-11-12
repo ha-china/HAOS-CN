@@ -60,7 +60,7 @@ Due to a recent surge of excessive invalid server requests (up to tens of thousa
 
 ### 🤖 Intelligent Installation Experience
 - 🚦 On system startup, **automatically** detects the network and installs ![HACS-China](https://img.shields.io/badge/HACS-China-41BDF5?style=for-the-badge&logo=home-assistant&logoColor=white)
-> To help more users experience Turbo Edition, friends willing to share a Token are welcome to [share here](https://tokenhub.hacs.vip/)
+> To help more users enjoy smooth access to the Marketplace in Home Assistant, friends willing to share a Token are welcome to [share here](https://hamrelay.hasscn.top/)
 
 ---
 
