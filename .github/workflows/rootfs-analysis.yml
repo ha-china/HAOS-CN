@@ -149,7 +149,7 @@ jobs:
 
       - name: Upload analysis artifacts
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: rootfs-analysis
           path: |

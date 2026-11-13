@@ -160,7 +160,7 @@ jobs:
           RAUC_PRIVATE_KEY: ${{ secrets.RAUC_PRIVATE_KEY }}
 
       - name: Restore ccache
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v6
         with:
           path: /mnt/cache/cc
           key: haos-cc-${{ matrix.target }}-${{ github.run_id }}
@@ -198,14 +198,14 @@ jobs:
 
       - name: Save ccache
         if: github.ref_name == 'dev'
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v6
         with:
           path: /mnt/cache/cc
           key: haos-cc-${{ matrix.target }}-${{ github.run_id }}
 
       - name: Upload QEMU image artifact for tests
         if: matrix.target == 'ova'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: haos_ova-${{ steps.image_version.outputs.version }}.qcow2.xz
           path: operating-system/output/images/haos_ova-*.qcow2.xz
@@ -272,7 +272,7 @@ jobs:
           sudo apt-get install -y qemu-system-x86 ovmf
 
       - name: Setup Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: '3.12'
 
@@ -280,7 +280,7 @@ jobs:
         run: pip install -r os-src/tests/requirements.txt
 
       - name: Download OS image
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: haos_ova-${{ needs.build.outputs.image_version }}.qcow2.xz
           path: image
@@ -304,7 +304,7 @@ jobs:
 
       - name: Archive test logs
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: test-logs
           retention-days: 7
